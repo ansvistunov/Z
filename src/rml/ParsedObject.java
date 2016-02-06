@@ -6,8 +6,7 @@
 package rml;
 import java.util.*;
 
-/**
-*/
+
 public interface ParsedObject{
-	public Object doParsing(Proper prop,Hashtable aliases) throws Exception;	
+	public Object doParsing(Proper prop,Hashtable aliasesrr) throws Exception;	
 }

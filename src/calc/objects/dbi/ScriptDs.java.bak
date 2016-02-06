@@ -1,0 +1,16 @@
+
+/*
+ * File: ScriptDs.java
+ *
+ * Created: Fri Jun 25 10:34:28 1999
+ *
+ * Copyright (c) by Almanex Technologes
+ *
+ *
+ * Author: Alexey Chen */
+
+package calc
+public class ScriptDs extends dbi.ScriptDs{
+
+	
+}

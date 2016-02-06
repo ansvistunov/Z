@@ -1,0 +1,73 @@
+
+/*
+ * File: ErrPrintStream.java
+ *
+ * Created: Fri Jun 25 15:23:54 1999
+ *
+ * Copyright (c) by Almanex Technologes
+ *
+ *
+ * Author: Alexey Chen */
+
+package loader;
+
+import java.io.*;
+import java.awt.*;
+
+public class ErrOutputStream extends OutputStream{
+	class CircleBuffer{
+		String[] circle = new String[200];
+		int curindex = 0;
+		public void append(String a){
+			if (curindex == circle.length) curindex=0;
+			circle[curindex] = a;
+			++curindex;
+		}
+		public String getText(){
+			StringBuffer ret = new StringBuffer(8*1024);
+			ret.append("Error Scrin\n");
+			int x = curindex;
+			if ( x == circle.length ) x = 0;
+			if ( circle[x] == null ) x = 0;
+			while ( circle[x] != null )
+				{ret.append(circle[x]).append("\n");}
+			return sb.toString();
+		}
+	}
+	class Vis extends Frame{
+		TextArea area = new TextArea();
+		CircleBuffer buffer;
+		public Vis(CircleBuffer buf){
+			super("Error");
+			buffer = buf;
+			area.setEditable(false);
+			setLayout(new BorderLayout());
+			add("Center",area);
+		}
+		public void rewrite(){
+			area.setText(buffer.getText());
+		}
+	}
+	
+	CircleBuffer buffer = new CircleBuffer();
+	Vis v = new Vis(buffer);
+	
+	StringBuffer sb = new StringBuffer();
+
+	public ErrPrintStream(){
+		v.setSize(400,500);
+		v.show();
+	}
+
+	public void write(byte[] buf, int off, int len){
+		StringBuffer sb = new StringBuffer(4*1024);
+		for (int i = 0; i < len; ++i){
+			if ( buf[i+off] == '\n' ){
+				buffer.append(sb.toString());
+				sb = new StringBuffer(4*1024);
+			}else{
+				sb.append((char)buf[i]);
+			}
+		}
+	}
+}

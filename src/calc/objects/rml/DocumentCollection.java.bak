@@ -1,0 +1,14 @@
+
+/*
+ * File: DocumentCollection.java
+ *
+ * Created: Thu Jul  1 16:28:36 1999
+ *
+ * Copyright (c) by Almanex Technologes
+ *
+ *
+ * Author: Alexey Chen */
+
+public class DocumentCollection extends {
+	Object get
+}

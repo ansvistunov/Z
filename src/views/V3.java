@@ -67,6 +67,8 @@ public abstract class V3 extends Panel{
  *
  */
 	abstract class VP{
+		
+
 		protected Path path;
 		protected String name;
 		protected int height;
@@ -98,6 +100,10 @@ public abstract class V3 extends Panel{
 			return new Dimension(width,height);
 		}
 
+		@Override
+		public String toString() {
+			return "VP [path=" + path + ", name=" + name + "]";
+		}
 		public boolean handle(int id,Point p){
 			//System.out.println("handle for point "+this);
 			VP vp = getObj(p);
@@ -182,8 +188,12 @@ public abstract class V3 extends Panel{
 			}
 		}
 		public String toString(){
-			return "NODE "+id+
-				"<"+name+"> "+path.getpath()+" open="+opened+" points="+points;
+			String s  = "NODE "+id+
+					"<"+name+"> "+path.getpath()+" open="+opened+" points count="+points.length+"{";
+			for (int i=0;i<points.length;i++) s+=points[i];
+			s+="}";
+			
+			return s;
 		}
 
 		public VNode(Path path,String name,FontMetrics VNfm,
@@ -274,7 +284,11 @@ public abstract class V3 extends Panel{
 
 		public boolean action(){
 			try{
+				//System.out.println("action try load node..."+ path.getpath()+ " "+name+" "+arg);
 				loadNode(path.getpath(),name,arg);
+				
+				//System.out.println("action loaded");
+				
 				if (!opened) {
 					if (points == null) load();
 					opened = true;
@@ -637,10 +651,18 @@ public abstract class V3 extends Panel{
 
 	void createPopupMenu(int x,int y){
 		System.out.println("~views.V3::createPopupMenu ::: menu not defined !!!");
+		String s = new String();
+		
+		vn.dump(s);
+		
+		System.out.println(s);
+		
 	}
 
 	void loadNode(VNode vn) throws Exception{
+		//System.out.println(" loadNode start");
 		char[] text = vn.path.getlist();
+		//System.out.println(" ltext="+text);
 		//System.out.println("path = "+vn.path+"\n"+(new String(text))); 
 		loadNode(vn,text);
 	}

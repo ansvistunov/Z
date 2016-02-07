@@ -39,8 +39,8 @@ public class IMPORTRML extends BaseExternFunction{
 				try{
 					char[] text = proto.getByName_chars(file,true);
 					rml.Proper p =  rml.Parser.createProper(text,null);
-					p.hash.put("###path###",path);
-					p.hash.put("###file###",file);
+					p./*hash.*/put("###path###",path);
+					p./*hash.*/put("###file###",file);
 					return p;
 				}catch(Exception e){
 					GLOBAL.messag(

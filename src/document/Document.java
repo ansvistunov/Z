@@ -509,8 +509,8 @@ while(stc.size() > 0){
 			if (DocName.charAt(0) == '&') {
 				try{
 					prop = (Proper)getcurd().aliases.get(DocName.substring(1));
-					d.myname = (String)prop.hash.get("###file###");
-					d.mypath = (String)prop.hash.get("###path###");
+					d.myname = (String)prop./*hash.*/get("###file###");
+					d.mypath = (String)prop./*hash.*/get("###path###");
 					//if (prop == null) throw new Exception();
 				}catch(Exception e){
 					//e.printStackTrace();
@@ -572,15 +572,22 @@ while(stc.size() > 0){
 												//System.out.println("element="+e.nextElement());										
 					}
 					recur(prop,0,_p,__h);
+					
 					//prop.dump();				}				
 				}catch(Exception e){System.out.println("Error processing style:"+e);}				///
 				//System.out.println(d.aliases);
                                 d.aliases.put("###VERSION###",new Double(d.version.intValue()));
 				Object[] ch = rml.Parser.getContent(prop,d.aliases);
+				
+				//Зачем здесь подменяется Proper????? Видимо, чтобы освободить память
+				
 				Proper x = new Proper();
 				x.hash = prop.hash;
 				d.aliases.put("###propers###",x);
 				prop = x;
+				
+				////////////////////
+				
 				Proper.clearDefault();
 				String script = (String)prop.get("PRELOADSCRIPT");
 				if (script!=null){
@@ -616,7 +623,7 @@ while(stc.size() > 0){
 			}
 			return d;
 		}catch(Exception e){
-			//e.printStackTrace();
+			e.printStackTrace();
 			//System.out.println("~document.Document::loadDocument \n\t"+e);
 			GLOBAL.messag("BadDocument: "+e.getMessage(),true);
 			throw new Exception("BadDocument: "+e.getMessage());
@@ -787,12 +794,13 @@ while(stc.size() > 0){
 			Hashtable h2 = (Hashtable)h.get("+"+foo.tag);			if (h1!=null){				Enumeration e = h1.keys();
 			while(e.hasMoreElements()){
 				Object o = e.nextElement();
-				Object o1 = foo.hash.get(o);				if (o1==null){					foo.hash.put(o,h1.get(o));				}
+				Object o1 = foo./*hash.*/get(o);				if (o1==null){					foo./*hash.*/put(o,h1.get(o));				}
 				}			}			//System.out.println("h2="+h2);
 			//System.out.println("h="+h);			if (h2!=null){				Enumeration e = h2.keys();
 			while(e.hasMoreElements()){
 				Object o = e.nextElement();
-				Object r = foo.hash.put(o,h2.get(o));
+				//Object r = 
+						foo./*hash.*/put(o,h2.get(o));
 				//if (r!=null)System.out.println("ret="+r);				
 				}			}
 			recur(foo.content,rec+1,p,h);

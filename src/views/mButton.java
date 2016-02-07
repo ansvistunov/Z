@@ -36,7 +36,7 @@ public class mButton extends java.awt.Button implements Selectable{
         if (parent instanceof FORM) return (FORM)parent;else return null;
     }
     
-    public Color getNotmalBgColor() {
+    public Color getNormalBgColor() {
     	return bg_color;
     	
     }
@@ -67,9 +67,9 @@ public class mButton extends java.awt.Button implements Selectable{
 		if (parent != null)
 			if (parent.isEditMaket()) {
 				if (parent.addMarkChild(this)) {
-					setBackground(Color.BLUE);
+					//setBackground(Color.BLUE);
 				} else {
-					setBackground(bg_color);
+					//setBackground(bg_color);
 				}
 				repaint();
 				return;

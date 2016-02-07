@@ -79,7 +79,7 @@ public class Field extends Container implements
         Container parent = super.getParent();
         if (parent instanceof FORM) return (FORM)parent;else return null;
     }
-    public Color getNotmalBgColor() {
+    public Color getNormalBgColor() {
     	return bg_color;
     	
     }
@@ -649,9 +649,9 @@ public class Field extends Container implements
 			if (parent != null)
 				if (parent.isEditMaket()) {
 					if (parent.addMarkChild(this)) {
-						setBackground(Color.BLUE);
+						//setBackground(Color.BLUE);
 					} else {
-						setBackground(bg_color);
+						//setBackground(bg_color);
 					}
 					repaint();
 					break;

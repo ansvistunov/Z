@@ -180,6 +180,10 @@ public class Boot extends Frame{
 		}else return super.handleEvent(ev);
 	}
 
+	
+	
+	
+	
 	public static void main(String args[]){
 		String s =
 			GLOBAL.pr(GLOBAL.SYSTEM_OUT,"NULL").trim().toUpperCase();
@@ -191,10 +195,21 @@ public class Boot extends Frame{
 			PrintStream ps = new PrintStream((OutputStream)new NullOutputStream());
 			System.setErr(ps);
 			System.setOut(ps);
+		}else if (s.equals("TRACER")){
+			try{
+				TracingPrintStream tps = new TracingPrintStream(new PrintStream(new File("out")));
+				System.setErr(tps);
+				System.setOut(tps);
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+						//System.setOut(tps);;
 		}
 		//System.runFinalizersOnExit(true);
 		new Boot();
 	}
+	
+	
 }
 
 

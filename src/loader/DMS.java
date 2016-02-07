@@ -27,7 +27,7 @@ public class DMS extends Dialog{
 	static FontMetrics fm;
 	static FontMetrics tfm;
 	static Label label = new Label("",Label.CENTER);
-        static TextArea txt = new TextArea();
+        static views.Label txt = new views.Label();
 	static {
 		Panel p = new Panel();
 		dm = p.getToolkit().getScreenSize();
@@ -100,7 +100,15 @@ public class DMS extends Dialog{
 		p.setLayout(new BorderLayout());
                 //label.setText(mesg);
                 //p.add("Center",label);
-                txt.setEditable(false);
+                //txt.setEditable(false);
+                txt.setFocusable(false);
+                
+                txt.setValignment("CENTER");
+                txt.setHalignment("CENTER");
+                txt.setMultiLine(true);
+                txt.setWordWrap(true);
+                txt.setBounds(10, 10, 100, 100);
+                
                 txt.setBackground(GLOBAL.color(p_color[GLOBAL.TEXTBG]));
                 txt.setForeground(GLOBAL.color(p_color[GLOBAL.TEXTFG]));
                 txt.setFont(fn);
@@ -110,7 +118,9 @@ public class DMS extends Dialog{
 		bp.setLayout(new FlowLayout(FlowLayout.CENTER));
 		bp.add(ButOk);
 		if (cancel) bp.add(ButCancel);
-                txt.setText(views.UTIL.makeWrap(mesg, " ", 300 - 20, fm));
+		txt.setFm(fm);
+		txt.setFont(fn);
+		txt.setValue(mesg);
                 ButOk.requestFocus();
 
 		try{

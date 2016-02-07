@@ -50,9 +50,9 @@ public class EXPORTRML extends BaseExternFunction{
 				}
 			}else{
 				try{
-					String foo1 = (String)p.hash.get("###path###");
+					String foo1 = (String)p./*hash.*/get("###path###");
 					if (foo1 != null) fd.setDirectory(foo1);
-					String foo = (String)p.hash.get("###file###");
+					String foo = (String)p./*hash.*/get("###file###");
 					if (foo != null) fd.setFile(foo1+foo);
 				}catch(Exception e){
 				}
@@ -71,10 +71,10 @@ public class EXPORTRML extends BaseExternFunction{
 				java.net.URL url = new java.net.URL("file:///"+path);
 				loader.FILE fl = new loader.FILE();
 				fl.init(url);
-				String encoding = (String)p.hash.get("ENCODING");
+				String encoding = (String)p./*hash.*/get("ENCODING");
 				if (encoding == null) {
 					encoding = "KOI8_R";
-					p.hash.put("ENCODING",encoding);
+					p./*hash.*/put("ENCODING",encoding);
 				}
 				try{
 					fl.write(file,encoding,p.toText());
@@ -84,8 +84,8 @@ public class EXPORTRML extends BaseExternFunction{
 						true);
 					continue;
 				}
-				p.hash.put("###path###",path);
-				p.hash.put("###file###",file);
+				p./*hash.*/put("###path###",path);
+				p./*hash.*/put("###file###",file);
 				return new Double(1);
 			}
 		}finally{

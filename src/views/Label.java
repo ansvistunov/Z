@@ -28,7 +28,22 @@ public class Label extends Component implements GlobalValuesObject,class_type,
     FontMetrics fm = null;
     String svalue = null;
     String halignment = "LEFT";
-    String valignment = "CENTER";
+    public void setHalignment(String halignment) {
+		this.halignment = halignment;
+	}
+
+	public void setValignment(String valignment) {
+		this.valignment = valignment;
+	}
+
+	public void setWordWrap(boolean wordWrap) {
+		this.wordWrap = wordWrap;
+	}
+
+	public void setMultiLine(boolean multiLine) {
+		this.multiLine = multiLine;
+	}
+	String valignment = "CENTER";
     String visible="YES";
     
     Object parent = null;
@@ -51,7 +66,7 @@ public class Label extends Component implements GlobalValuesObject,class_type,
         if (parent instanceof FORM) return (FORM)parent;else return null;
     }
     
-    public Color getNotmalBgColor() {
+    public Color getNormalBgColor() {
     	return bg_color;
     	
     }
@@ -138,7 +153,15 @@ public class Label extends Component implements GlobalValuesObject,class_type,
     
     }
     
-    public void setScaleFont(int a) {
+    public FontMetrics getFm() {
+		return fm;
+	}
+
+	public void setFm(FontMetrics fm) {
+		this.fm = fm;
+	}
+
+	public void setScaleFont(int a) {
         Font tmp = getFont();
         if (tmp==null) return;
         scaleFont = new Font(tmp.getName(),tmp.getStyle(), tmp.getSize()*a/100);
@@ -286,9 +309,9 @@ public class Label extends Component implements GlobalValuesObject,class_type,
     			if (parent != null)
     				if (parent.isEditMaket()) {
     					if (parent.addMarkChild(this)) {
-    						setBackground(Color.BLUE);
+    						//setBackground(Color.BLUE);
     					} else {
-    						setBackground(bg_color);
+    						//setBackground(bg_color);
     					}
     					repaint();
     					break;
@@ -299,7 +322,7 @@ public class Label extends Component implements GlobalValuesObject,class_type,
     
 	
 	//Ìועמהû טםעונפויסא GlobalValuesObject
-    public void setValue(Object o){}
+    public void setValue(Object o){svalue  = o.toString();}
     public void setValueByName(String name, Object o) {}
     public Object getValue(){return this;}
     public Object getValueByName(String name) {return null;}

@@ -75,7 +75,7 @@ public class Loader {
 					GLOBAL.PRINT_RED+
 					"~loader.Loader::loadByName_chars exception \n\t"+
 					GLOBAL.PRINT_NORMAL+e);*/
-			throw new Exception("~loader.Loader::loadByName_chars loading");
+			throw new Exception("~loader.Loader::loadByName_chars loading. Error reading file "+name);
 		}
 	}
 	public char[] loadByName_chars(String name) throws Exception{

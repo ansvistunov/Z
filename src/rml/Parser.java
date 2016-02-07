@@ -367,12 +367,12 @@ public class Parser{
 
 	static final String rp = GLOBAL.PRINT_BLUE+"~rml.Parser::paser "+GLOBAL.PRINT_NORMAL;
 	
-	public static Proper parser(Lexemator lex) throws Exception{
+	/*public static Proper parser(Lexemator lex) throws Exception{
 		return parser(lex,null);
 		
-	}
+	}*/
 	
-	static Proper parser(Lexemator lex, ParserObserver po) throws Exception{
+	static Proper parser(Lexemator lex /*, ParserObserver po*/) throws Exception{
 		int cc=0;
 		int state = SS;
 		Proper prop = new Proper();
@@ -388,28 +388,29 @@ public class Parser{
 				if (lex.type() == Lexemator.LDEF){
 					state = STAG;
 				}else state = SBK;
-				if (po!=null) po.SS(cc);
+				//if (po!=null) po.SS(cc);
 				
 			break;
 			case STAG:// обработка тега
 				prop.tag = lex.as_string();
 				if (GLOBAL.parser_debug>1)
 					System.out.println(rp+sts[SP]);
-				if (po!=null) po.STAG(cc,prop.tag);
+				//if (po!=null) po.STAG(cc,prop.tag);
 			// none BREAK;	!!!!
 			case SP:
 				cc = lex.next();
 				if (lex.type() == Lexemator.LDEF){
 					state = SPROP;
 				}else state = SBK;
-				if (po!=null) po.SP(cc);
+				//if (po!=null) po.SP(cc);
 			break;
 			case SPROP:// свойства
 				propName = lex.as_string();
 				cc = lex.next();
-				if (po!=null) po.SPROP(cc,propName);
+				//if (po!=null) po.SPROP(cc,propName);
+				prop.put(propName,"",cc,-1);
 				if ( lex.type() != Lexemator.LEQU ){ 
-					prop.put(propName,"");
+					prop.put(propName,"",cc,-1);
 					if (lex.type() == Lexemator.LDEF){
 						state = SPROP;
 					}else{
@@ -427,19 +428,19 @@ public class Parser{
 				if (GLOBAL.parser_debug>1)
 					System.out.println(rp+" lexema "+lex.type());
 				
-				if (po!=null) po.SVSD(cc, lex.as_string());
+				//if (po!=null) po.SVSD(cc, lex.as_string());
 				switch(lex.type()){
 				case Lexemator.LINT:
-					prop.put(propName,new Integer(lex.as_int()));
+					prop.put(propName,new Integer(lex.as_int()),-1,cc);
 				break;
 				case Lexemator.LFLT:
-					prop.put(propName,new Double(lex.as_double()));
+					prop.put(propName,new Double(lex.as_double()),-1,cc);
 				break;
 				case Lexemator.LSTR:
 				case Lexemator.LDEF:
 					if (GLOBAL.parser_debug>1)
 						System.out.println(rp+": = str");
-					prop.put(propName,lex.as_string());
+					prop.put(propName,lex.as_string(),-1,cc);
 				break;	
 				default: 
 					throw new Exception(rp+"No reaction,(proper = ?????) line "+
@@ -454,7 +455,7 @@ public class Parser{
 						System.out.println(rp+"------- } ");
 					cc = lex.next();
 				}else state= SF;
-				if (po!=null) po.SBK(cc);
+				//if (po!=null) po.SBK(cc);
 /*throw new Exception(rp+"\n\t"+
   GLOBAL.PRINT_LIGHT+
   "RML error in line "+lex.line+
@@ -464,14 +465,14 @@ public class Parser{
 			case SOBK:// новое вложение
 				if (GLOBAL.parser_debug>1)
 					System.out.println(rp+"------- { ");
-				Proper p = parser(lex,po);
+				Proper p = parser(lex /*,po*/);
 				Proper.add(prop,p);
 				state = SBK;
 				if (lex.type() == Lexemator.LEND) state = SF;
-				if (po!=null) po.SOBK(cc);
+				//if (po!=null) po.SOBK(cc);
 			break;
 			case SF:// конечное состояние
-				if (po!=null) po.SF(cc);
+				//if (po!=null) po.SF(cc);
 				return prop;
 
 			default:
@@ -484,18 +485,18 @@ public class Parser{
 	 * построить дерево свойств по тексту описания документов
 	 * с макроподстановкой значений из args
 	 */
-	public static Proper createProper(char[] text, Object[] args)
+	/*public static Proper createProper(char[] text, Object[] args)
 		throws Exception {
-		return createProper(text,args,null);
-	}
+		return createProper(text,args);
+	}*/
 	
-	public static Proper createProper(char[] text, Object[] args, ParserObserver po)
+	public static Proper createProper(char[] text, Object[] args /*, ParserObserver po*/)
 			throws Exception {
 			GLOBAL.waitin();
 			try{
 				Lexemator lex = new Lexemator(text);
 				Proper.clearDefault();
-				Proper prop = parser(lex,po);
+				Proper prop = parser(lex/*,po*/);
 				if (GLOBAL.parser_debug>0) prop.dump();
 				return prop;
 			}finally{

@@ -135,6 +135,7 @@ public class FILE implements Protocol{
 			fs.write(data);
 			fs.close();
 		}catch(Exception e){
+			e.printStackTrace();
 			if(GLOBAL.loader_exception)
 				System.out.println(
 					GLOBAL.PRINT_GREEN+
@@ -169,9 +170,9 @@ public class FILE implements Protocol{
 			if (GLOBAL.loader_exception)
 				System.out.println(
 					GLOBAL.PRINT_RED+
-					"~loader.FILE::getByName Exception \n\t"+
+					"~loader.FILE::getByName Exception: error reading file"+path+" \n\t"+
 					GLOBAL.PRINT_NORMAL+e);
-			throw new Exception("~loader.FILE::getByName get file!");
+			throw new Exception("~loader.FILE::getByName get file! error reading file"+path);
 		}
 	}
 	

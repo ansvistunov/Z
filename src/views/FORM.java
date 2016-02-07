@@ -42,10 +42,13 @@ public class FORM extends Panel implements Retrieveable,
     	requestFocus();
     	if (markChilds.contains(f)){
     		markChilds.remove(f);
+    		//f.setBackground(c);
+    		if (f instanceof Selectable) f.setBackground(((Selectable)f).getNormalBgColor());
     		return false;
     	}
     	else{
     		markChilds.add(f);
+    		f.setBackground(Color.GREEN);
     		return true;
     		
     	}
@@ -432,19 +435,21 @@ public class FORM extends Panel implements Retrieveable,
     	return false;
     }
     */
-    boolean process_CTRL_R() {
-    	System.out.println("Ctrl-R called");
+    boolean process_CTRL_F4() {
+    	
     	editMaket = !editMaket;
     	if (editMaket) {
+    		System.out.println("Enter in edit maket mode");
     		for(int i=0;i<markChilds.size();i++){
     			Component o = markChilds.elementAt(i);
     			if (o instanceof views.Field ) ((views.Field)o).setFocus(false);
     		}
     	}else{
+    		System.out.println("Edit mode closed");
     		for(int i=0;i<markChilds.size();i++){
     			Component o = markChilds.elementAt(i);
     			if (o instanceof Selectable) {
-    				o.setBackground(((Selectable)o).getNotmalBgColor());
+    				o.setBackground(((Selectable)o).getNormalBgColor());
     				o.repaint();
     				}
     		}
@@ -487,18 +492,23 @@ public class FORM extends Panel implements Retrieveable,
     
     
 	class PanelKeyAdapter extends KeyAdapter {
-
+		
+		
 		public void keyPressed(KeyEvent e) {
 			// if (GLOBAL.views_debug>1) System.out.println("PanelKeyAdapter
 			// char="+e.getKeyChar()+" mods="+e.getModifiers());
 
-			if (e.getKeyCode() == (int) 'R' && e.isControlDown()) {
-				process_CTRL_R();
+			if (e.getKeyCode() == KeyEvent.VK_F4 && e.isControlDown()) {
+				process_CTRL_F4();
 				return;
 			}
 
-			if (e.getKeyCode() == (int) 'T' && e.isControlDown()) {
-				process_CTRL_T();
+			if (e.getKeyCode() == KeyEvent.VK_F5 && e.isControlDown()) {
+				process_CTRL_F5_F6(false);
+				return;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_F6 && e.isControlDown()) {
+				process_CTRL_F5_F6(true);
 				return;
 			}
 
@@ -556,9 +566,11 @@ public class FORM extends Panel implements Retrieveable,
 
 		}
 
-		private void process_CTRL_T() {
+		private void process_CTRL_F5_F6(boolean samefile) {
 			// TODO Auto-generated method stub
-			RmlMem2File.propFromFile(aliases,"generated.rml");
+			
+			RmlMem2File.propFromFile(aliases,samefile);
+			
 
 		}
 

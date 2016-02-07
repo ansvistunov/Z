@@ -1,87 +1,156 @@
 package rml;
 
 import java.awt.Component;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.Rectangle;
 import java.io.FileOutputStream;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 
+import calc.RTException;
 import loader.GLOBAL;
-import rml.RmlRectangle.vertex;
+import rml.Proper.PropHash.HashRow;
+
 
 public class RmlMem2File {
-	static ParserObserver observer = new ParserObserver();
+	//static ParserObserver observer = new ParserObserver();
 	static char[] blanks={' ',' ',' ',' ',' ',' '};
+	static String[] filerProps = {"LEFT","TOP","WIDTH","HEIGHT"};
+	static String[] tags = {"FIELD","LABEL","BUTTON"};
 	static int srcPos = 0;
 	static int destPos = 0;
 	static char[] text;
 	static char[] result;
 	
-	public static Proper propFromFile(Hashtable aliases, String outfile) {
+	public static Proper propFromFile(Hashtable aliases, boolean samefile) {
 		String n = document.Document.getcurd().myname;
 		String p = document.Document.getcurd().mypath;
 		System.out.println("n="+n+" p="+p);
 		srcPos = destPos = 0;
-		observer.clear();
+		//observer.clear();
+		Vector<String> tmp;
+		
+		//Proper proper = (Proper) aliases.get("###propers###");
+		
+		tmp = new Vector<String> (Arrays.asList(tags));
+		
 		
 		try {
 			text = GLOBAL.loader.loadByName_chars(p+"/"+n, true);
 			System.out.println("text.length="+text.length);
-			Proper prop =  rml.Parser.createProper(text, null, observer);
+			Proper proper =  rml.Parser.createProper(text, null);
 			
-			Vector<String> keys = observer.getKeys();
-			System.out.println(keys);
-			Vector<RmlRectangle> recs = observer.getRecs();
-			System.out.println(recs);
+			/*Vector<RmlElement> elements = observer.getElements();*/
+			// оставляем только интересующие нас тэги ,те в которых нет алиасов - тоже убираем
 			
+			tmp = new Vector<String> (Arrays.asList(tags));
 			
-			int nac = needAddChar(keys,recs,aliases);
+			/*for (int i=0; i<elements.size();){
+				RmlElement c = elements.elementAt(i);
+				//System.out.println("tag="+c.tag);
+				if (!tmp.contains(c.tag) || c.getAlias() == null) {
+					elements.removeElementAt(i);
+					//System.out.println("tag="+c.tag+" removed");
+				}else{
+					i++;
+				}
+			}*/
+			
+			Iterator<Proper> itp = proper.filerTags(tmp);
+			
+			//System.out.println(elements);
+			
+			int nac = needAddChar(itp,aliases);
 			
 			System.out.println("nac="+nac);
 			if (nac>0) 
 				result = new char[text.length+nac];
 			else result = text;
 			
-			//result = new char[text.length+nac]; //TODO эту строчку закомментировать!!!!
 			
+			//Vector<String> f = new Vector(); f.add("LEFT");f.add("TOP");
 			
-			
-			String key;
 			srcPos = 0;
 			destPos = 0;
 			
-			for(int i=0;i<keys.size();i++){
-				 key = keys.elementAt(i);
-				 Object o = aliases.get(key);
-				 if (o instanceof Component) {
-					 Rectangle rec = ((Component)o).getBounds();
-					 System.out.println(rec);
-					 RmlRectangle rmlrec = recs.elementAt(i);
-					 
-					 RmlRectangle.vertex v = rmlrec.getMin();
-					 partCopy(rec,rmlrec,v);
-					 
-					 v = rmlrec.getMin();
-					 partCopy(rec,rmlrec,v);
-					 
-					 v = rmlrec.getMin();
-					 partCopy(rec,rmlrec,v);
-					 
-					 v = rmlrec.getMin();
-					 partCopy(rec,rmlrec,v);
-					 
-					 
-				 }
+			itp = proper.filerTags(tmp);
+			
+			//System.out.println(proper.toText());
+			
+			tmp = new Vector<String> (Arrays.asList(filerProps));
+			
+			while(itp.hasNext()) {
+				Proper pp = itp.next();
+				Iterator<HashRow> iii =  pp.filerProps(tmp);
+				Object alias = pp.get("ALIAS");
+				System.out.println("alias for "+pp+" "+alias);
+				if (alias == null) continue;
+				
+				Object o = aliases.get(alias); //взяли компонент, который редактируем
+				Rectangle rec = null;
+				if (o instanceof Component) {
+					rec = ((Component)o).getBounds();
+				}
+				while(iii.hasNext()) {
+					HashRow hr = iii.next();
+					partCopy(rec,hr);
+					System.out.println(hr);
+				}
+					
 			}
 			
+			
+			
+			/*for (int i=0;i<elements.size();i++) { //цикл по тэгам (элементам)
+				RmlElement rmlelem = elements.get(i);
+				Iterator<RmlElementProp> it = rmlelem.filerElements(tmp);
+				Object o = aliases.get(rmlelem.getAlias()); //взяли компонент, который редактируем
+				Rectangle rec = null;
+				if (o instanceof Component) {
+					rec = ((Component)o).getBounds();
+				}
+				while (it.hasNext()) {	//цикл по свойствам
+					RmlElementProp ep = it.next();
+					partCopy(rec,ep);
+					System.out.println(ep);
+					
+				}
+			}*/
+			
+			
+			
+			
+			
 			System.arraycopy(text, srcPos, result, destPos, text.length - srcPos); //копируем хвост
-			if (outfile == null) outfile=p+"/"+n;
+			String outfile;
+			if (samefile) {
+				outfile=p+"/"+n;
+			}else{
+				try{
+					Frame f = new Frame();
+					FileDialog fd = new FileDialog(f,"",FileDialog.SAVE);
+					
+					String file = null;
+					String path;
+						fd.show();
+						path = fd.getDirectory();
+						file = fd.getFile();
+						if ( file == null) throw new RTException("Cancel","");
+						outfile = file;
+						System.out.println("outfile:"+outfile);
+				}finally{
+				}
+				
+			}
 			
 			GLOBAL.loader.write(outfile,"CP1251" , result); //TODO что-то нужно делать с кодировкой
 			
 			
-			return prop;
+			return proper;
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -91,30 +160,44 @@ public class RmlMem2File {
 	}; 
 	
 	
-	static void partCopy(Rectangle rec, RmlRectangle rmlrec, vertex v) {
+	static void partCopy(Rectangle rec, HashRow rmlprop) {
 		int memlen;
 		int flen;
 		int diff; 
 		int len;
-		switch (v) {
-		case X:
-			len = rmlrec.sx - srcPos;
+		
+		int foo = -1;
+		
+		switch(rmlprop.name.toString()){
+		case "LEFT": foo = rec.x; break;
+		case "TOP": foo = rec.y; break;
+		case "WIDTH": foo = rec.width;break;
+		case "HEIGHT": foo = rec.height; break;
+		}
+		
+			len = rmlprop.s - srcPos;
 			System.arraycopy(text, srcPos, result, destPos, len ); // начало
 			srcPos += len;
 			destPos += len;
-			memlen = getPropLength(rec.x);
-			flen = getPropLength(rmlrec.x);
+			
+			memlen = getPropLength(foo);
+			flen = getPropLength(getIntProp(rmlprop.value));
 			diff = flen - memlen;
 			
-			int blen = (rmlrec.ex-rmlrec.sx);
-			System.arraycopy(blanks, 0, result, destPos, blen);
+			int blen = (rmlprop.e-rmlprop.s);
+			System.arraycopy(blanks, 0, result, destPos, blen); //забили пробелами место под значение свойства
+			
+			if (blen > memlen && blen > flen) {
+				srcPos += (blen-flen);
+				destPos +=(blen-flen);
+			}
 			
 			/*int blen = (rmlrec.ex-rmlrec.sx) - flen;
 			if (blen>0) {System.arraycopy(blanks, 0, result, destPos, blen);
 			destPos += blen;}*/
 			
 			
-			System.arraycopy(String.valueOf(rec.x).toCharArray(), 0, result, destPos, memlen); // значение
+			System.arraycopy(String.valueOf(foo).toCharArray(), 0, result, destPos, memlen); // значение
 			srcPos += flen;
 			destPos += memlen;
 			//
@@ -128,143 +211,51 @@ public class RmlMem2File {
 																	// уменьшилась
 				destPos += diff;
 			}
-			rmlrec.sx = Integer.MAX_VALUE;
-			break;
-		case Y:
-			len = rmlrec.sy - srcPos;
-			System.arraycopy(text, srcPos, result, destPos, len); // начало
-			srcPos += len;
-			destPos += len;
-			memlen = getPropLength(rec.y);
-			flen = getPropLength(rmlrec.y);
-			diff = flen - memlen;
 			
 			
-			blen = (rmlrec.ey-rmlrec.sy);
-			System.arraycopy(blanks, 0, result, destPos, blen);
-			/*blen = (rmlrec.ey-rmlrec.sy) - flen;
-			if (blen>0) {System.arraycopy(blanks, 0, result, destPos, blen);
-			destPos += blen;}*/
-			
-			System.arraycopy(String.valueOf(rec.y).toCharArray(), 0, result, destPos, memlen); // значение
-			srcPos += flen;
-			destPos += memlen;
-			//
-			
-			if (diff > 0) {
-				System.arraycopy(blanks, 0, result, destPos, diff); // забили
-																	// пробелами,
-																	// если
-																	// длина
-																	// значения
-																	// уменьшилась
-				destPos += diff;
-			}
-			rmlrec.sy = Integer.MAX_VALUE;
-			break;
-		case H:
-			len = rmlrec.sh - srcPos;
-			System.arraycopy(text, srcPos, result, destPos, len); // начало
-			srcPos += len;
-			destPos += len;
-			memlen = getPropLength(rec.height);
-			flen = getPropLength(rmlrec.h);
-			diff = flen - memlen;
-			
-			blen = (rmlrec.eh-rmlrec.sh);
-			System.arraycopy(blanks, 0, result, destPos, blen);
-			/*blen = (rmlrec.eh-rmlrec.sh) - flen;
-			if (blen>0) {System.arraycopy(blanks, 0, result, destPos, blen);
-			destPos += blen;}*/
-			
-			System.arraycopy(String.valueOf(rec.height).toCharArray(), 0, result, destPos, memlen); // значение
-			srcPos += flen;
-			destPos += memlen;
-			//System.arraycopy(blanks, 0, result, destPos, rmlrec.eh-rmlrec.sh);
-			
-			if (diff > 0) {
-				System.arraycopy(blanks, 0, result, destPos, diff); // забили
-																	// пробелами,
-																	// если
-																	// длина
-																	// значения
-																	// уменьшилась
-				destPos += diff;
-			}
-			rmlrec.sh = Integer.MAX_VALUE;
-			break;
-		case W:
-			len = rmlrec.sw - srcPos;
-			System.arraycopy(text, srcPos, result, destPos, len); // начало
-			srcPos += len;
-			destPos += len;
-			memlen = getPropLength(rec.width);
-			flen = getPropLength(rmlrec.w);
-			diff = flen - memlen;
-			
-			
-			blen = (rmlrec.ew-rmlrec.sw);
-			System.arraycopy(blanks, 0, result, destPos, blen);
-			/*blen = (rmlrec.ew-rmlrec.sw) - flen;
-			if (blen>0) {System.arraycopy(blanks, 0, result, destPos, blen);
-			
-			destPos += blen;}*/
-			
-			System.arraycopy(String.valueOf(rec.width).toCharArray(), 0, result, destPos, memlen); // значение
-			srcPos += flen;
-			destPos += memlen;
-			//System.arraycopy(blanks, 0, result, destPos, rmlrec.ew-rmlrec.sw);
-			
-			if (diff > 0) {
-				System.arraycopy(blanks, 0, result, destPos, diff); // забили
-																	// пробелами,
-																	// если
-																	// длина
-																	// значения
-																	// уменьшилась
-				destPos += diff;
-			}
-			rmlrec.sw = Integer.MAX_VALUE;
-			break;
-
-		}
 
 	}
 	
-	static int needAddChar(Vector<String> keys, Vector<RmlRectangle> recs, Hashtable aliases){
+	static int getIntProp(Object value) {
+		int i = Integer.parseInt(value.toString());
+		return i;
+	}
+	
+	static int needAddChar(Iterator<Proper> itp, Hashtable aliases){
 		
 		String key;
 		int meml,filel;
 		int addchars = 0;
 		int c;
 		
-		for (int i=0;i<keys.size();i++){
-			 key = keys.elementAt(i);
-			 Object o = aliases.get(key);
+		while(itp.hasNext()){
+			Proper re = itp.next();
+			Object o = aliases.get(re.tag);
 			 if (o instanceof Component) {
 				 Rectangle rec = ((Component)o).getBounds();
-				 RmlRectangle rmlrec = recs.elementAt(i);
+				 
+				 //RmlRectangle rmlrec = recs.elementAt(i);
 				 
 				 meml = getPropLength(rec.x);
-				 filel = getPropLength(rmlrec.x);
+				 filel = getPropLength(getIntProp(re.get("LEFT")));
 				 c = meml - filel;
 				 
 				 if (c>0) addchars+=c;
 				 
 				 meml = getPropLength(rec.y);
-				 filel = getPropLength(rmlrec.y);
+				 filel = getPropLength(getIntProp(re.get("TOP")));
 				 c = meml - filel;
 				 
 				 if (c>0) addchars+=c;
 				 
 				 meml = getPropLength(rec.width);
-				 filel = getPropLength(rmlrec.w);
+				 filel = getPropLength(getIntProp(re.get("WIDTH")));
 				 c = meml - filel;
 				 
 				 if (c>0) addchars+=c;
 				 
 				 meml = getPropLength(rec.height);
-				 filel = getPropLength(rmlrec.h);
+				 filel = getPropLength(getIntProp(re.get("HEIGHT")));
 				 c = meml - filel;
 				 
 				 if (c>0) addchars+=c;

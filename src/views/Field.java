@@ -6,6 +6,7 @@ import java.math.*;
 import java.sql.*;
 import java.text.*;
 import rml.*;
+import views.edit.EditMaketAdapter;
 import calc.*;
 import document.NotifyInterface;
 import loader.GLOBAL;
@@ -468,6 +469,7 @@ public class Field extends Container implements
         if (depends==null) return;
         for (int i = 0; i < depends.length; i++ ){
             views.Field f = (views.Field)aliases.get(depends[i]);
+            //System.out.println("calculating depends f = "+f);
             if (f!=null) {
                 f.calc();
             }
@@ -647,12 +649,9 @@ public class Field extends Container implements
 		case MouseEvent.MOUSE_PRESSED:
 			FORM parent = getFormParent();
 			if (parent != null)
-				if (parent.isEditMaket()) {
-					if (parent.addMarkChild(this)) {
-						//setBackground(Color.BLUE);
-					} else {
-						//setBackground(bg_color);
-					}
+				if (EditMaketAdapter.isEditMaket()){
+					if (e.isControlDown())	EditMaketAdapter.getEditMaketAdapter(parent).addMarkChild(this);
+					else EditMaketAdapter.getEditMaketAdapter(parent).setMarkChild(this);
 					repaint();
 					break;
 				}
@@ -665,7 +664,7 @@ public class Field extends Container implements
     public boolean setFocus(boolean b) {
         if (b) {
         	FORM parent = getFormParent();
-        	if (parent!=null) if (parent.isEditMaket()) return false;
+        	if (parent!=null) if (EditMaketAdapter.isEditMaket()) return false;
             if (inFocus) return true;
             boolean flag = true;
             Component[] siblings = getParent().getComponents();

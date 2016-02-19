@@ -20,7 +20,7 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 	
 	@Override
 	public String toString() {
-		return "Proper [tag=" + tag + "]";
+		return "Proper [tag=" + tag + " id="+id+"]";
 	}
 
 	public class PropHash extends Hashtable{
@@ -28,13 +28,13 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 		HashRow tmp;
 		
 		@Override
-		public synchronized Enumeration elements() {
-			// TODO Auto-generated method stub
+		public synchronized Enumeration<HashRow> elements() {
+			
 			return elements.elements();
 		}
 		@Override
-		public synchronized Enumeration keys() {
-			// TODO Auto-generated method stub
+		public synchronized Enumeration<HashRow> keys() {
+			
 			return elements.elements();
 		}
 		
@@ -43,7 +43,7 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 			//System.out.println("get: key="+key);
 			//if (true) return super.get(key);
 					
-			// TODO Auto-generated method stub
+			
 			HashRow hr;
 			
 			tmp.name = key;
@@ -65,10 +65,6 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 		}
 		
 		public synchronized Object put(Object key, Object value, int s, int e) {
-			// TODO Auto-generated method stub
-			//return super.put(key, value);
-			
-			
 			
 			//System.out.println("put: key="+key+" value="+value);
 			//if (true) return super.put(key,value);
@@ -139,7 +135,7 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 			public boolean equals(Object obj) {
 				
 				//System.out.println("equals called");
-				// TODO Auto-generated method stub
+				
 				if (obj == this) return true;
 				if (obj instanceof HashRow) {
 					return ((HashRow)obj).name.toString().equals(this.name.toString());
@@ -166,7 +162,7 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 		
 		public PropHash(){
 			super(0);
-			elements = new Vector();
+			elements = new Vector<>();
 			tmp = new HashRow(null,-1,-1,null);
 		}
 		
@@ -180,8 +176,16 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 	public PropHash hash;
 	Hashtable dhash = null;
 	static Hashtable sdhash = null;
+	int id = -1;
+	
+	public String getAliasOrId(){
+		Object ret = get("ALIAS");
+		if (ret == null) ret = tag+"_"+id;
+		return ret.toString();
 		
-	public Proper(){
+	}
+	
+	public Proper(int id){
 		hash = new PropHash();
 		if ( dhash == null ) {
 			if (sdhash == null) {
@@ -189,6 +193,7 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 			}
 			dhash = sdhash;
 		}
+		this.id = id;
 	}
 
 	public Proper( String tag, Proper defu){
@@ -211,7 +216,7 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 			
 			Proper current = null;
 			Proper next = Proper.this;
-			Stack<Proper> stack = new Stack();
+			Stack<Proper> stack = new Stack<>();
 			Callback finder = new Callback(){
 
 				@Override
@@ -306,48 +311,7 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 		}
 	}
 
-	class Traversal implements Callback{
-		
-		StringBuffer sb;
-		public Traversal(){
-			sb = new StringBuffer();
-			//System.out.println("String buffer created");
-		}
-		
-		@Override
-		public String toString() {
-			return sb.toString();
-		}
-		@Override
-		public Object callback(Object arg) throws Exception {
-			Object[] arr = (Object[])arg;
-			int rec = (int)arr[1];
-			Proper foo = (Proper)arr[0];
-			for ( int i=0; i<rec ; ++i) sb.append("    ");
-			//String s = sb.toString();
-			//if ( rec != 0 ) sb.append("{"); 
-			sb.append(foo.tag+"\n");			
-			Enumeration<HashRow> e = foo.hash.elements();
-			while(e.hasMoreElements()){
-				HashRow o = e.nextElement();
-				if ( ((String)o.name).startsWith("##") ) continue; 
-				
-			    sb.append("    "+
-						   o.name+
-						   " = "+
-						   ((o.value instanceof String)?"\"":"")+
-						   o.value+
-						   ((o.value instanceof String)?"\"":"")+
-						   "\n");
-			}
-			//if ( rec != 0 ) sb.append("}"); 
-			sb.append("\n");
-			return rec;
-		}
-		
-		
-		
-	}
+	
 	
 	/*void recur_dump(Proper prop, int rec,StringBuffer sbb){
 		StringBuffer sb = new StringBuffer();
@@ -423,7 +387,51 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 		recur_dump(this,0,sbb);
 		return sbb.toString();*/
 		
-		Traversal t = new Traversal();
+		
+		
+		
+		Callback t = new Callback() {
+			
+			StringBuffer sb = new StringBuffer();
+			
+			
+			@Override
+			public String toString() {
+				return sb.toString();
+			}
+			@Override
+			public Object callback(Object arg) throws Exception {
+				Object[] arr = (Object[])arg;
+				int rec = (int)arr[1];
+				Proper foo = (Proper)arr[0];
+				for ( int i=0; i<rec ; ++i) sb.append("    ");
+				//String s = sb.toString();
+				//if ( rec != 0 ) sb.append("{"); 
+				sb.append(foo.tag+"\n");			
+				Enumeration<HashRow> e = foo.hash.elements();
+				while(e.hasMoreElements()){
+					HashRow o = e.nextElement();
+					if ( ((String)o.name).startsWith("##") ) continue; 
+					
+				    sb.append("    "+
+							   o.name+
+							   " = "+
+							   ((o.value instanceof String)?"\"":"")+
+							   o.value+
+							   ((o.value instanceof String)?"\"":"")+
+							   "\n");
+				}
+				//if ( rec != 0 ) sb.append("}"); 
+				sb.append("\n");
+				return rec;
+			}
+			
+			
+			
+		};
+		
+		
+		
 		try {
 			traversal2(new Stack<Proper> (), this,0,t);
 		} catch (Exception e) {

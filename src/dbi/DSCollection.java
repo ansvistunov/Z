@@ -229,6 +229,9 @@ public class DSCollection extends DATASTORE {
 	public void setValue(Object obj){};
     public Object getValue(){ return this;};
     public void setValueByName(String name, Object obj){};
+    
+    public Object GETVALUEBYNAME(String name){return getValueByName(name);}
+    
     public Object getValueByName(String name){
 		//System.out.println("dbi.DSCollection.getValuebyName called");
 		Object o = null;

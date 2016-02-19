@@ -431,6 +431,12 @@ while(stc.size() > 0){
 		}
 		dg.setSize(width,height);
 		dg.setLayout(new GridLayout(1,1));
+		
+		//alex
+		Dimension dm = dg.getToolkit().getScreenSize();
+		dg.setLocation((dm.width-width)/2,(dm.height-height)/2);
+		//end alex
+		
 		Panel p = new Panel();
 		dg.add(p);
 		callDocument(p,new Panel());
@@ -579,9 +585,13 @@ while(stc.size() > 0){
                                 d.aliases.put("###VERSION###",new Double(d.version.intValue()));
 				Object[] ch = rml.Parser.getContent(prop,d.aliases);
 				
+				
+				//System.out.println("docement load aliases="+d.aliases);
+				
+				
 				//Зачем здесь подменяется Proper????? Видимо, чтобы освободить память
 				
-				Proper x = new Proper();
+				Proper x = new Proper(-1);
 				x.hash = prop.hash;
 				d.aliases.put("###propers###",x);
 				prop = x;
@@ -598,6 +608,8 @@ while(stc.size() > 0){
 				script = (String)prop.get("POSTLOADSCRIPT");
 				if (script!=null){
 					Calc c = new Calc(script);
+					
+					//System.out.println(d.aliases);
 					c.eval(d.aliases);
 				}
 

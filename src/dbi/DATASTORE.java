@@ -1023,6 +1023,10 @@ public class DATASTORE implements GlobalValuesObject,class_method,class_type{
 			return ((Object[])data.elementAt(skeys[crow]))[getColumn(column)];
 		}else return parent.getKValue(skeys[crow],column);
 	};
+	
+	
+	public Object GETVALUE (String column) {return getValue(column);}
+	
 	/**
 	*Возвращает значение столбца выборки из текущей строк
 	*/
@@ -2472,6 +2476,10 @@ public class DATASTORE implements GlobalValuesObject,class_method,class_type{
 		System.out.println("+++ Datastore says: I gc'ed!;alias="+alias);
 		System.out.println("Total memory:"+Runtime.getRuntime().totalMemory());
 		System.out.println("Free memory:"+Runtime.getRuntime().freeMemory());
+	}
+	@Override
+	public String toString() {
+		return "DATASTORE [alias=" + alias + ", countRows=" + countRows + ", readOnly=" + readOnly + "]";
 	}
 
 }

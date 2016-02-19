@@ -7,23 +7,20 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
 
+import calc.JSLan;
 import calc.OP;
 import calc.RTException;
 import loader.GLOBAL;
 import loader.Loader;
 
+
 public class JSF extends BaseExternFunction {
-	static ScriptEngine jsEngine;
 	Loader loader;
 	
-	private Bindings h2b(Hashtable h){
-		SimpleBindings b = new SimpleBindings((Hashtable<String, Object>)h);
-		return b;
-		
-	}
+	
 
 	public Object eval() throws Exception {
-		if (jsEngine==null) throw new Exception ("No script engine found for JavaScript");
+		//if (jsEngine==null) throw new Exception ("No script engine found for JavaScript");
         Object o = OP.doHardOP(expr);
         if (!(o instanceof String)) throw new RTException("CastException","JSF");
         //System.out.println("o="+o);
@@ -39,7 +36,7 @@ public class JSF extends BaseExternFunction {
         Object r;
         
         try{
-        	r =  jsEngine.eval(new String(text),h2b(expr.getAliases()));
+        	r =  JSLan.eval(new String(text),expr.getAliases());
         }catch(Exception e){
         	System.out.println("JavaScripFile :"+o+"\n Error is:"+e.getMessage());
         	throw e;
@@ -52,20 +49,7 @@ public class JSF extends BaseExternFunction {
         
     }
 	
-	static{
-		
-		ScriptEngineManager scriptEngineMgr = new ScriptEngineManager();
-
-		jsEngine = scriptEngineMgr.getEngineByName("JavaScript");
-		if (jsEngine == null) {
-			System.out.println("No script engine found for JavaScript");
-			
-		}
-		
-		
-		
-		
-	}
+	
 	
 	
 }

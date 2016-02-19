@@ -187,6 +187,8 @@ public class Boot extends Frame{
 	public static void main(String args[]){
 		String s =
 			GLOBAL.pr(GLOBAL.SYSTEM_OUT,"NULL").trim().toUpperCase();
+		//System.out.println(s);
+		
 		if ( s.equals("WINDOW") ){
 			PrintStream ps = new PrintStream((OutputStream)new ErrOutputStream());
 			System.setErr(ps);

@@ -22,6 +22,8 @@ public class BUTTON implements ParsedObject{
 		String alias = (String)prop.get("ALIAS");
 		if (alias!=null){
 			aliases.put(alias.toUpperCase(),(Object)btn);
+		} else {
+			aliases.put(prop.getAliasOrId().toUpperCase(),(Object)btn);
 		}
 		btn.init(prop,aliases);
 		return (Object)btn;

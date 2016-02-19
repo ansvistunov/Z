@@ -75,6 +75,7 @@ public class Calc {
             Class cls = Class.forName(
              GLOBAL.pr(GLOBAL.calcLanguage+"."+lang,"XXXX").trim());
             cl = (__calc__)cls.newInstance();
+            aliases.put(lang, cl);
          }catch(Exception _){
             throw new Exception ("cant load language :\n\t"+
                _.getMessage());
@@ -125,6 +126,9 @@ public class Calc {
       throws Exception{
 		try{
 		StringTokenizer st = new StringTokenizer("_"+str,"~");
+		
+		//System.out.println("macro aliases="+aliases);
+		
 		boolean flag = false;
 		String result ="";
 		while(st.hasMoreTokens()){

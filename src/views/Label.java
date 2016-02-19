@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 
 import rml.*;
 import views.FORM;
+import views.edit.EditMaketAdapter;
 
 import java.util.*;
 import calc.*;
@@ -306,16 +307,12 @@ public class Label extends Component implements GlobalValuesObject,class_type,
         switch(e.getID()) {
             case MouseEvent.MOUSE_PRESSED:
             	FORM parent = getFormParent();
-    			if (parent != null)
-    				if (parent.isEditMaket()) {
-    					if (parent.addMarkChild(this)) {
-    						//setBackground(Color.BLUE);
-    					} else {
-    						//setBackground(bg_color);
-    					}
-    					repaint();
-    					break;
-    				}
+            	if (EditMaketAdapter.isEditMaket()){
+					if (e.isControlDown())	EditMaketAdapter.getEditMaketAdapter(parent).addMarkChild(this);
+					else EditMaketAdapter.getEditMaketAdapter(parent).setMarkChild(this);
+					repaint();
+					break;
+				}
             break;
         }
     }

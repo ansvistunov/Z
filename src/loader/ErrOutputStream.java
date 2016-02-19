@@ -103,7 +103,7 @@ public class ErrOutputStream extends OutputStream{
 				Hashtable a = new Hashtable();
 				rml.Proper p = null;
 				if ( pages[curentpage].trim().equals("") ){
-					p = new rml.Proper();
+					p = new rml.Proper(0);
 				}else {
 					try{
 						p = rml.Parser.createProper(pages[curentpage].toCharArray(),

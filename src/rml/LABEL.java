@@ -9,6 +9,8 @@ public class LABEL implements ParsedObject {
 		String alias = (String)prop.get("ALIAS");
 		if (alias!=null){
 			aliases.put(alias.toUpperCase(),(Object)lab);
+		} else {
+			aliases.put(prop.getAliasOrId().toUpperCase(),(Object)lab);
 		}
                 lab.init(prop, aliases);
 		return (Object)lab;

@@ -320,6 +320,8 @@ public class TreeView2 extends Panel implements ActionListener,
 		return "VIEWS_TREEVIEW2";
 	}
 
+    public int getLevel() {return tv.getCurrentLevel();}
+    
 	//Методы интерфейса class_method
 	public Object method(String method,Object arg) throws Exception{
 	    //обработка вызова метода CurrentValue

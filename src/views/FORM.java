@@ -8,6 +8,7 @@ import java.math.*;
 import java.text.*;
 import rml.Proper;
 import rml.RmlMem2File;
+import views.edit.EditMaketAdapter;
 import dbi.*;
 import loader.GLOBAL;
 import calc.*; 
@@ -33,27 +34,9 @@ public class FORM extends Panel implements Retrieveable,
     views.Menu menu;
     ActionListener popupAL;
     Hashtable aliases;
-    Vector<Component> markChilds = new Vector();
+   
     
-    boolean editMaket = false;
     
-    public boolean isEditMaket() {return editMaket;}
-    public boolean addMarkChild(Component f) {
-    	requestFocus();
-    	if (markChilds.contains(f)){
-    		markChilds.remove(f);
-    		//f.setBackground(c);
-    		if (f instanceof Selectable) f.setBackground(((Selectable)f).getNormalBgColor());
-    		return false;
-    	}
-    	else{
-    		markChilds.add(f);
-    		f.setBackground(Color.GREEN);
-    		return true;
-    		
-    	}
-    	
-    }
     
     
     public FORM() {
@@ -61,7 +44,7 @@ public class FORM extends Panel implements Retrieveable,
         setLayout(null);
         setFont(new Font(font_face,font_family,font_size));
         enableEvents(AWTEvent.MOUSE_EVENT_MASK);
-        addKeyListener(new PanelKeyAdapter());
+        addKeyListener(EditMaketAdapter.createEditMaketAdapter(this));
         //enableEvents(AWTEvent.KEY_EVENT_MASK);
         //panel.setLayout(null);
         //add(panel);
@@ -394,8 +377,15 @@ public class FORM extends Panel implements Retrieveable,
             System.out.println("Property 'bg_color' not found !");
         }
         
+        EditMaketAdapter.getEditMaketAdapter(this).setAliases(aliases);
+        
         sp = (String)prop.get("ALIAS");
-        if (sp!=null) setalias(sp); else {System.out.println("Property 'alias' not found !");}
+        if (sp!=null) setalias(sp); else {System.out.println("Property 'alias' not found !");
+        
+        //////////////////////////////////////////////////////////////////
+        
+        ///////////////////////////////////////////////////////////////////////
+        }
     }
     
     public Field getField(String name) {
@@ -435,32 +425,7 @@ public class FORM extends Panel implements Retrieveable,
     	return false;
     }
     */
-    boolean process_CTRL_F4() {
-    	
-    	editMaket = !editMaket;
-    	if (editMaket) {
-    		System.out.println("Enter in edit maket mode");
-    		for(int i=0;i<markChilds.size();i++){
-    			Component o = markChilds.elementAt(i);
-    			if (o instanceof views.Field ) ((views.Field)o).setFocus(false);
-    		}
-    	}else{
-    		System.out.println("Edit mode closed");
-    		for(int i=0;i<markChilds.size();i++){
-    			Component o = markChilds.elementAt(i);
-    			if (o instanceof Selectable) {
-    				o.setBackground(((Selectable)o).getNormalBgColor());
-    				o.repaint();
-    				}
-    		}
-    		
-    		markChilds.clear();
-    		
-    	}
-    	requestFocus();
-    	return true;
-    	
-    };
+    
     
     
     
@@ -491,91 +456,7 @@ public class FORM extends Panel implements Retrieveable,
     }
     
     
-	class PanelKeyAdapter extends KeyAdapter {
-		
-		
-		public void keyPressed(KeyEvent e) {
-			// if (GLOBAL.views_debug>1) System.out.println("PanelKeyAdapter
-			// char="+e.getKeyChar()+" mods="+e.getModifiers());
-
-			if (e.getKeyCode() == KeyEvent.VK_F4 && e.isControlDown()) {
-				process_CTRL_F4();
-				return;
-			}
-
-			if (e.getKeyCode() == KeyEvent.VK_F5 && e.isControlDown()) {
-				process_CTRL_F5_F6(false);
-				return;
-			}
-			if (e.getKeyCode() == KeyEvent.VK_F6 && e.isControlDown()) {
-				process_CTRL_F5_F6(true);
-				return;
-			}
-
-			if (editMaket) {
-
-				for (int i = 0; i < markChilds.size(); i++) {
-
-					Component currentChild = markChilds.elementAt(i);
-					int gap = 0;
-					if (e.isControlDown())
-						gap = 1;
-					else
-						gap = 10;
-					Rectangle r = currentChild.getBounds();
-					int tmp;
-					if (!e.isShiftDown()) {
-						switch (e.getKeyCode()) {
-						case KeyEvent.VK_UP:
-							r.y -= gap;
-							break;
-						case KeyEvent.VK_DOWN:
-							r.y += gap;
-							break;
-						case KeyEvent.VK_LEFT:
-							r.x -= gap;
-							break;
-						case KeyEvent.VK_RIGHT:
-							r.x += gap;
-							break;
-
-						}
-					} else {
-						switch (e.getKeyCode()) {
-						case KeyEvent.VK_UP:
-							r.height -= gap;
-							break;
-						case KeyEvent.VK_DOWN:
-							r.height += gap;
-							break;
-						case KeyEvent.VK_LEFT:
-							r.width -= gap;
-							break;
-						case KeyEvent.VK_RIGHT:
-							r.width += gap;
-							break;
-
-						}
-
-					}
-					currentChild.setBounds(r);
-
-				}
-
-			}
-
-		}
-
-		private void process_CTRL_F5_F6(boolean samefile) {
-			// TODO Auto-generated method stub
-			
-			RmlMem2File.propFromFile(aliases,samefile);
-			
-
-		}
-
-	}
-    
+	    
     
     //Ìועמהû טםעונפויסא class_method
     public Object method(String method,Object arg) throws Exception{

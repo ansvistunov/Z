@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.*;
 import rml.*;
 import views.FORM;
+import views.edit.EditMaketAdapter;
 import calc.*;
 import java.util.*;
 
@@ -65,12 +66,11 @@ public class mButton extends java.awt.Button implements Selectable{
 		
 		FORM parent = getFormParent();
 		if (parent != null)
-			if (parent.isEditMaket()) {
-				if (parent.addMarkChild(this)) {
-					//setBackground(Color.BLUE);
-				} else {
-					//setBackground(bg_color);
-				}
+			if (EditMaketAdapter.isEditMaket()) {
+				if ((ev.getModifiers() & 128 /*ActionEvent.CTRL_MASK????? */)!=0) EditMaketAdapter.getEditMaketAdapter(parent).addMarkChild(this);
+				else EditMaketAdapter.getEditMaketAdapter(parent).setMarkChild(this);
+				
+				//System.out.println("ev="+ev+" mod="+ev.getModifiers()+" act="+ev.getActionCommand()+" cm="+ActionEvent.CTRL_MASK);
 				repaint();
 				return;
 			}

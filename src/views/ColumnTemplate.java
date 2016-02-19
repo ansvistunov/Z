@@ -75,7 +75,7 @@ public class ColumnTemplate {
     }
 
     public Proper getProperties() {
-        Proper ret = new Proper();
+        Proper ret = new Proper(-1);
         if (title_font_face!=null) ret.put("TITLE_FONT_FACE",title_font_face);
         if (title_font_size != null) ret.put("TITLE_FONT_SIZE",title_font_size);
         if (title_font_family!=null) ret.put("TITLE_FONT_FAMILY",title_font_family);
@@ -96,7 +96,7 @@ public class ColumnTemplate {
     }
 
     public static Proper getDefaultProperties() {
-        Proper ret = new Proper();
+        Proper ret = new Proper(-1);
         ret.put("TITLE_FONT_FACE","Dialog");
         ret.put("TITLE_FONT_SIZE",new Integer(12));
         ret.put("TITLE_FONT_FAMILY",new Integer(0));

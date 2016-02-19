@@ -15,6 +15,8 @@ public class FIELD implements ParsedObject{
 		String alias = (String)prop.get("ALIAS");
 		if (alias!=null){
 			aliases.put(alias.toUpperCase(),(Object)fld);
+		} else {
+			aliases.put(prop.getAliasOrId().toUpperCase(),(Object)fld);
 		}
 		fld.init(prop,aliases);
 		return (Object)fld;

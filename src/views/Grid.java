@@ -7,6 +7,7 @@ import java.io.*;
 import java.math.*;
 import java.util.*;
 import rml.Proper;
+import views.edit.EditMaketAdapter;
 import dbi.*;
 import document.*;
 import document.Closeable;
@@ -128,6 +129,9 @@ public class Grid extends Panel implements
         enableEvents(AWTEvent.MOUSE_EVENT_MASK);
         clipboard = getToolkit().getSystemClipboard();
         //addMouseListener(new ML());
+        
+       // addKeyListener(EditMaketAdapter.createEditMaketAdapter(aliases,this));
+        
     }
 
     public void addChildren(Object[] objs) {
@@ -1561,6 +1565,9 @@ public class Grid extends Panel implements
     public String type(){
 		return "VIEWS_GRID";
 	}
+    
+    public dbi.DATASTORE getDatastore() {return ds;}
+    
 
 	//Ìועמהû טםעונפויסא class_method
 	public Object method(String method,Object arg) throws Exception{

@@ -11,6 +11,8 @@ public class COLUMN implements ParsedObject{
 		String alias = (String)prop.get("ALIAS");
 		if (alias!=null){
 			aliases.put(alias.toUpperCase(),(Object)col);
+		} else {
+			aliases.put(prop.getAliasOrId().toUpperCase(),(Object)col);
 		}
 		col.init(prop,aliases);
 		Object[] objs = Parser.getContent(prop,aliases);

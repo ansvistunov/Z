@@ -19,14 +19,17 @@ import rml.Proper.PropHash.HashRow;
 public class RmlMem2File {
 	//static ParserObserver observer = new ParserObserver();
 	static char[] blanks={' ',' ',' ',' ',' ',' '};
-	static String[] filerProps = {"LEFT","TOP","WIDTH","HEIGHT"};
-	static String[] tags = {"FIELD","LABEL","BUTTON"};
+	static String[] filerProps = {"LEFT","TOP","WIDTH","HEIGHT","SIZE"};
+	static String[] tags = {"FIELD","LABEL","BUTTON","COLUMN"};
 	static int srcPos = 0;
 	static int destPos = 0;
 	static char[] text;
 	static char[] result;
 	
 	public static Proper propFromFile(Hashtable aliases, boolean samefile) {
+		
+		System.out.println("propFromFile aliases="+aliases);
+		
 		String n = document.Document.getcurd().myname;
 		String p = document.Document.getcurd().mypath;
 		System.out.println("n="+n+" p="+p);
@@ -86,19 +89,24 @@ public class RmlMem2File {
 			while(itp.hasNext()) {
 				Proper pp = itp.next();
 				Iterator<HashRow> iii =  pp.filerProps(tmp);
-				Object alias = pp.get("ALIAS");
+				String alias = pp.getAliasOrId();
 				System.out.println("alias for "+pp+" "+alias);
 				if (alias == null) continue;
 				
 				Object o = aliases.get(alias); //взяли компонент, который редактируем
+				if (o == null) continue;
 				Rectangle rec = null;
+				int cs=-1;
 				if (o instanceof Component) {
 					rec = ((Component)o).getBounds();
+				} else if (o instanceof views.Column){
+					cs  =((views.Column)o).getSize();
 				}
 				while(iii.hasNext()) {
 					HashRow hr = iii.next();
-					partCopy(rec,hr);
-					System.out.println(hr);
+					
+					partCopy(rec,hr,cs);
+					System.out.println("hr="+hr+" rec="+rec);
 				}
 					
 			}
@@ -124,6 +132,7 @@ public class RmlMem2File {
 			
 			
 			
+			System.out.println("text.length="+text.length+" srcPos="+srcPos+" result.length="+result.length+" destPos="+destPos+" len="+ (text.length - srcPos) );
 			
 			System.arraycopy(text, srcPos, result, destPos, text.length - srcPos); //копируем хвост
 			String outfile;
@@ -160,7 +169,7 @@ public class RmlMem2File {
 	}; 
 	
 	
-	static void partCopy(Rectangle rec, HashRow rmlprop) {
+	static void partCopy(Rectangle rec, HashRow rmlprop, int colsize ) {
 		int memlen;
 		int flen;
 		int diff; 
@@ -173,6 +182,7 @@ public class RmlMem2File {
 		case "TOP": foo = rec.y; break;
 		case "WIDTH": foo = rec.width;break;
 		case "HEIGHT": foo = rec.height; break;
+		case "SIZE": foo = colsize; break;
 		}
 		
 			len = rmlprop.s - srcPos;
@@ -187,30 +197,20 @@ public class RmlMem2File {
 			int blen = (rmlprop.e-rmlprop.s);
 			System.arraycopy(blanks, 0, result, destPos, blen); //забили пробелами место под значение свойства
 			
-			if (blen > memlen && blen > flen) {
+			if (blen >= memlen && blen >= flen) {
 				srcPos += (blen-flen);
-				destPos +=(blen-flen);
+				destPos +=(blen-memlen);
+				System.arraycopy(String.valueOf(foo).toCharArray(), 0, result, destPos, memlen); // значение
+				srcPos += flen;
+				destPos += memlen;
+			}else{
+				System.arraycopy(String.valueOf(foo).toCharArray(), 0, result, destPos, memlen); // значение
+				srcPos += blen;
+				destPos += memlen;
+				
 			}
 			
-			/*int blen = (rmlrec.ex-rmlrec.sx) - flen;
-			if (blen>0) {System.arraycopy(blanks, 0, result, destPos, blen);
-			destPos += blen;}*/
 			
-			
-			System.arraycopy(String.valueOf(foo).toCharArray(), 0, result, destPos, memlen); // значение
-			srcPos += flen;
-			destPos += memlen;
-			//
-			
-			if (diff > 0) {
-				System.arraycopy(blanks, 0, result, destPos, diff); // забили
-																	// пробелами,
-																	// если
-																	// длина
-																	// значения
-																	// уменьшилась
-				destPos += diff;
-			}
 			
 			
 
@@ -228,9 +228,11 @@ public class RmlMem2File {
 		int addchars = 0;
 		int c;
 		
+		System.out.println(" needAddChar called");
+		
 		while(itp.hasNext()){
 			Proper re = itp.next();
-			Object o = aliases.get(re.tag);
+			Object o = aliases.get(re.getAliasOrId());
 			 if (o instanceof Component) {
 				 Rectangle rec = ((Component)o).getBounds();
 				 
@@ -240,11 +242,15 @@ public class RmlMem2File {
 				 filel = getPropLength(getIntProp(re.get("LEFT")));
 				 c = meml - filel;
 				 
+				 System.out.println("c="+c);
+				 
 				 if (c>0) addchars+=c;
 				 
 				 meml = getPropLength(rec.y);
 				 filel = getPropLength(getIntProp(re.get("TOP")));
 				 c = meml - filel;
+				 
+				 System.out.println("c="+c);
 				 
 				 if (c>0) addchars+=c;
 				 
@@ -252,10 +258,21 @@ public class RmlMem2File {
 				 filel = getPropLength(getIntProp(re.get("WIDTH")));
 				 c = meml - filel;
 				 
+				 System.out.println("c="+c);
+				 
 				 if (c>0) addchars+=c;
 				 
 				 meml = getPropLength(rec.height);
 				 filel = getPropLength(getIntProp(re.get("HEIGHT")));
+				 c = meml - filel;
+				 
+				 System.out.println("c="+c);
+				 
+				 if (c>0) addchars+=c;
+				 
+			 } else if (o instanceof views.Column){
+				 meml = getPropLength(((views.Column)o).getSize());
+				 filel = getPropLength(getIntProp(re.get("SIZE")));
 				 c = meml - filel;
 				 
 				 if (c>0) addchars+=c;

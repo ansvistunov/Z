@@ -372,10 +372,10 @@ public class Parser{
 		
 	}*/
 	
-	static Proper parser(Lexemator lex /*, ParserObserver po*/) throws Exception{
+	static Proper parser(Lexemator lex /*, ParserObserver po*/, int lexcount) throws Exception{
 		int cc=0;
 		int state = SS;
-		Proper prop = new Proper();
+		Proper prop = new Proper(lexcount++);
 		String propName="none";
 		if (GLOBAL.parser_debug>1)
 			System.out.println(rp+"start parsing");
@@ -465,7 +465,7 @@ public class Parser{
 			case SOBK:// новое вложение
 				if (GLOBAL.parser_debug>1)
 					System.out.println(rp+"------- { ");
-				Proper p = parser(lex /*,po*/);
+				Proper p = parser(lex /*,po*/,lexcount++);
 				Proper.add(prop,p);
 				state = SBK;
 				if (lex.type() == Lexemator.LEND) state = SF;
@@ -496,7 +496,7 @@ public class Parser{
 			try{
 				Lexemator lex = new Lexemator(text);
 				Proper.clearDefault();
-				Proper prop = parser(lex/*,po*/);
+				Proper prop = parser(lex/*,po*/,0);
 				if (GLOBAL.parser_debug>0) prop.dump();
 				return prop;
 			}finally{

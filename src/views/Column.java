@@ -72,6 +72,8 @@ public class Column implements GlobalValuesObject{
     }
 
     public Object getParent(){return parent;}
+    
+    public int getSize() {return size;}
 
     public void init(Proper prop, Hashtable aliases) {
         String sp;

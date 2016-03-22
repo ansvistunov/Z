@@ -2,6 +2,8 @@
 package views;
 import java.awt.*;
 import rml.*;
+import views.edit.EditMaketAdapter;
+
 import java.util.*;
 import loader.GLOBAL;
 import dbi.DATASTORE;
@@ -83,6 +85,9 @@ public class ReportForm extends Container {
         
         sp = (String)prop.get("TYPE");//это св-во используется для колонтитулов
         if (sp!=null) type = sp;
+        
+        //addKeyListener(EditMaketAdapter.createEditMaketAdapter(this));
+        
     }
     
     public void addChildren(Object[] objs) {

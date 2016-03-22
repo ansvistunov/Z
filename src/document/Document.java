@@ -171,7 +171,7 @@ WindowListener{
 		}
 	}
 
-
+public Hashtable getParentAliases() {return parent_aliases;}
 
 /***
  *
@@ -807,7 +807,7 @@ while(stc.size() > 0){
 			while(e.hasMoreElements()){
 				Object o = e.nextElement();
 				Object o1 = foo./*hash.*/get(o);				if (o1==null){					foo./*hash.*/put(o,h1.get(o));				}
-				}			}			//System.out.println("h2="+h2);
+				} 			}			//System.out.println("h2="+h2);
 			//System.out.println("h="+h);			if (h2!=null){				Enumeration e = h2.keys();
 			while(e.hasMoreElements()){
 				Object o = e.nextElement();
@@ -823,12 +823,32 @@ while(stc.size() > 0){
 	}
 
 
+	/*
+	 * dialog manipulation
+	 */
+
+		public void messag(String messag,boolean error){
+			GLOBAL.messag(messag, error);
+		}
+
+		public boolean sure(String messag,boolean error){
+			return GLOBAL.sure(messag,error);
+		}
+
+		
+
+	
+	
+	
 // implementaion of GlobalValuesObject
 
 	public void setValue(Object obj) throws Exception{}
     public Object getValue() throws Exception{return this;}
     public void setValueByName(String name, Object obj) throws Exception {}
     public Object getValueByName(String name) throws Exception {return null;}
+    
+    
+    
 
 //implementaion of class_method
 

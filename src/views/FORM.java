@@ -119,6 +119,9 @@ public class FORM extends Panel implements Retrieveable,
 			if (o instanceof views.mButton) {
 				super.add((views.mButton)o);
 			}
+			if (o instanceof views.FORM) {
+				super.add((views.FORM)o);
+			}
         }        
     }
     

@@ -6,6 +6,7 @@ import java.util.*;
 import rml.*;
 import java.awt.event.*;
 import loader.GLOBAL;
+import views.edit.EditMaketAdapter;
 import views.printing.*;
 import calc.objects.*;
 import calc.*;
@@ -32,9 +33,9 @@ public class Report extends Panel implements Retrieveable,
     dbi.Group droot = null;
     int numRows=0;//число строк в Datastore;
 
-    Toolbar tb = new Toolbar();
+    Toolbar tb; 
     ScrollPane sp = new ScrollPane();
-    WorkCanvas workArea = new WorkCanvas();
+    WorkCanvas workArea; 
 
     //поля для печати и разбивки на страницы
     int numPages = 0;
@@ -61,10 +62,16 @@ public class Report extends Panel implements Retrieveable,
         setLayout(null);
         setBackground(Color.white);
         //doLayout();
+        tb = new Toolbar();
         add(tb);
+        workArea = new WorkCanvas();
         sp.add(workArea);
         add(sp);
+        
     }
+    
+    
+    
 
     public void doLayout() {
         System.out.println("doLayout called");
@@ -201,6 +208,8 @@ public class Report extends Panel implements Retrieveable,
                 pageSize.height = t;
             }
         }
+        
+        EditMaketAdapter.getEditMaketAdapter(workArea).setAliases(aliases);
     }
 
     public void paint(Graphics g){
@@ -782,7 +791,14 @@ public class Report extends Panel implements Retrieveable,
 
             add(wp1);
             add(wp2);
+            
+            
+            
+            
+            
         }
+        
+        
 
         void initNumCopies() {
             for (int i=1;i<=10;i++) {
@@ -831,6 +847,22 @@ public class Report extends Panel implements Retrieveable,
 		public boolean note=false;
 		public String str1=null;
 		public String str2=null;
+		//asw
+		public WorkCanvas(){
+			super();
+			
+            enableEvents(AWTEvent.MOUSE_EVENT_MASK);
+            addKeyListener(EditMaketAdapter.createEditMaketAdapter(this));
+           
+            
+		}
+		
+		public void processMouseEvent(MouseEvent e) {
+            //System.out.println("Report mouse click "+e);
+            if (e.getButton() == MouseEvent.BUTTON1) requestFocus();
+        }
+		//asw
+		
         public synchronized void paint(Graphics g) {
 			if (note) {
 				g.setFont(new Font("Serif",2,40));

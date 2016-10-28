@@ -141,6 +141,19 @@ WindowListener{
 			next = h;
 		}
 	}
+	
+	
+	static Editor editor;
+	
+	public static void setEditor(Editor editor){
+		Document.editor = editor;
+	}
+	
+	public static Editor getEditor(){
+		return editor;
+	}
+	
+	
 	/** */
 	//void setNafigator(Nafigator naf) {this.naf=naf;}
 	public static Document getcurd(){
@@ -169,6 +182,7 @@ WindowListener{
 				// nothing to do
 			}
 		}
+		
 	}
 
 public Hashtable getParentAliases() {return parent_aliases;}
@@ -206,61 +220,66 @@ public Hashtable getParentAliases() {return parent_aliases;}
 
 
 	/** */
-	public void close(){
+	public void close() {
 		// удалить документ
-		//System.out.println("closescript is "+closescript);
-		try{
-			if ( closescript != null ) closescript.eval(aliases);
-		}catch(Exception e){
+		// System.out.println("closescript is "+closescript);
+		try {
+			if (closescript != null)
+				closescript.eval(aliases);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		dbsbroker.saveall();
-                //pavel
-                if (collection != null)
-                  collection.removeLocks();
-                //end pavel
+		// pavel
+		if (collection != null)
+			collection.removeLocks();
+		// end pavel
 		cntr.removeAll();
 		cntr.add(parent_panel);
 		cntr.validate();
-/* igor: begin !!!!!!!!!! */
-Stack stc = new Stack();
-stc.push(cntr);
-Container tcmp;
-Component[] tcomps;
-int u;
-while(stc.size() > 0){
-   tcmp  = (Container)stc.pop();
-   tcomps = tcmp.getComponents();
-   for(u = 0; u < tcomps.length; u++){
-      if (tcomps[u] instanceof Container)
-         stc.push(tcomps[u]);
-      tcomps[u].repaint();
-   }
-}
-/* end !!!!!!!!!! */
+		/* igor: begin !!!!!!!!!! */
+		Stack stc = new Stack();
+		stc.push(cntr);
+		Container tcmp;
+		Component[] tcomps;
+		int u;
+		while (stc.size() > 0) {
+			tcmp = (Container) stc.pop();
+			tcomps = tcmp.getComponents();
+			for (u = 0; u < tcomps.length; u++) {
+				if (tcomps[u] instanceof Container)
+					stc.push(tcomps[u]);
+				tcomps[u].repaint();
+			}
+		}
+		/* end !!!!!!!!!! */
 
-                
 		setcurd(oldd);
 		// если это был последний документ в окне - закрыть окно
-		if ( --counter == 0 ) dg.hide();
-		else{
-			if (actor!=null) actor.notifyActioner();
+		if (--counter == 0)
+			dg.hide();
+		else {
+			if (actor != null)
+				actor.notifyActioner();
 			String title;
-			try{
-				title =
-					(String)((Proper)parent_aliases.get("###propers###")).
-					get("DOCUMENT_TITLE");
-			}catch(Exception e){
-				title = GLOBAL.pr(GLOBAL.TITLE_MAINWINDOW,"MainWindow");
+			try {
+				title = (String) ((Proper) parent_aliases.get("###propers###")).get("DOCUMENT_TITLE");
+			} catch (Exception e) {
+				title = GLOBAL.pr(GLOBAL.TITLE_MAINWINDOW, "MainWindow");
 			}
-			if ( title == null ) title = GLOBAL.pr(GLOBAL.TITLE_MAINWINDOW,"MainWindow");
-			if ( dg != null ) dg.setTitle(GLOBAL.c2b(title,GLOBAL.DTITLE));
-			else GLOBAL.nafigator.setTitle(GLOBAL.c2b(title,GLOBAL.FTITLE));
+			if (title == null)
+				title = GLOBAL.pr(GLOBAL.TITLE_MAINWINDOW, "MainWindow");
+			if (dg != null)
+				dg.setTitle(GLOBAL.c2b(title, GLOBAL.DTITLE));
+			else
+				GLOBAL.nafigator.setTitle(GLOBAL.c2b(title, GLOBAL.FTITLE));
 		}
 
+		if (editor!=null) editor.closeNotify();
 	}
 
-	/** */
+	/** сброс документа к "первоначальному" состоянию. для коллекции перегенирируются первичные ключи 
+	 * Для всех элементов вызывается метод fromDS, который обычно считывает данные из Datastore */
 	public void reset() throws Exception{
 		if ( collection != null ) {
 		    collection.reset();
@@ -383,6 +402,17 @@ while(stc.size() > 0){
 		dc.parent_aliases = aliases;
 		return dc.callDocument(getcurd().cntr,getcurd().mypanel);
 	}
+        
+        
+	public static synchronized Document callDocumentSomeWindowFromMemory(String docName,char[] text, Object[] objs,
+			Hashtable aliases, Actioner actor) throws Exception {
+		Document dc;
+		dc = Document.loadDocument(docName, objs, GLOBAL.loader, text);
+		dc.actor = actor;
+		dc.parent_aliases = aliases;
+		return dc.callDocument(getcurd().cntr, getcurd().mypanel);
+	} 
+        
 
 	/**
 	 * загрузить и открыть документ в новом окне
@@ -493,11 +523,19 @@ while(stc.size() > 0){
 	}
 
 
+	public static synchronized Document loadDocument(String DocName,Object[] args,
+			 Loader loader) throws Exception{
+		
+		return loadDocument(DocName,args,loader,null);
+		
+	}
+	
+	
     /**
 	 * загрузить документ
 	 */
         public static synchronized Document loadDocument(String DocName,Object[] args,
-							 Loader loader)
+							 Loader loader, char[] __text)
 		throws Exception{
 		try{
 			Document d;
@@ -530,9 +568,15 @@ while(stc.size() > 0){
 					d.myname = DocName.substring(foo+1);
 					d.mypath = DocName.substring(0,foo);
 				}else d.myname = DocName;
-				char[] text = loader.loadByName_chars(DocName,true);
+				if (__text==null) { //идет загрузка из файла
+					__text = loader.loadByName_chars(DocName,true);
+				}//иначе - идет загрузка из редактора
+				
+				if (editor!=null) 
+					editor.loadDocument(DocName, __text, args);
+				
 				try{
-					prop = rml.Parser.createProper(text,null);
+					prop = rml.Parser.createProper(__text,null);
 				}catch(Exception e){
 					throw e;
 				}

@@ -53,6 +53,9 @@ public class Column implements GlobalValuesObject{
 
     public Validator validator = new Validator();
     Calc calc = null;
+    
+    boolean multiline=false;
+    boolean wordwrap = false;
 
     public Column(){
     }
@@ -137,6 +140,18 @@ public class Column implements GlobalValuesObject{
         if (sp!=null) setType(sp);
         sp = (String)prop.get("EDITMASK");
         if (sp!=null) validator.setMask(sp);
+        
+        
+        sp = (String)prop.get("MULTILINE");
+        if (sp!=null && sp.toUpperCase().equals("YES"))
+            multiline = true;
+        else multiline = false;
+        
+        sp = (String)prop.get("WORDWRAP");
+        if (sp!=null && sp.toUpperCase().equals("YES"))
+            wordwrap = true;
+        else wordwrap = false;
+        
 
         if (exp!=null) calc = new Calc(exp);
     }

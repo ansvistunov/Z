@@ -2,8 +2,12 @@
 package views;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.*;
 import rml.*;
+import views.edit.EditMaketAdapter;
 import calc.*;
 import calc.objects.*;
 
@@ -13,6 +17,9 @@ public class CheckBox extends Checkbox implements GlobalValuesObject, class_type
 
     String onValue=null;
     String offValue=null;
+    String aaction = null;
+    Calc calc = null;
+    Hashtable aliases;
 
     public CheckBox() {
         super();
@@ -21,6 +28,8 @@ public class CheckBox extends Checkbox implements GlobalValuesObject, class_type
     public void init(Proper prop, Hashtable aliases) {
         String sp;
         Integer ip;
+        
+        this.aliases = aliases;
 
         onValue = (String)prop.get("ONVALUE");
         offValue = (String)prop.get("OFFVALUE");
@@ -31,6 +40,38 @@ public class CheckBox extends Checkbox implements GlobalValuesObject, class_type
 
         sp = (String)prop.get("LABEL");
         if (sp!=null) setLabel(sp);
+        
+        sp = (String)prop.get("ACTION");
+		if (sp!=null) {
+			//System.out.println("action="+sp);
+			calc = new Calc(sp);
+			//System.out.println("calc="+calc);
+			}
+		aaction = (String)prop.get("AACTION");
+		
+		addItemListener(new ItemListener() {
+	         public void itemStateChanged(ItemEvent event) {   
+	        	 //System.out.println("CHECKBOX processEvent called ev="+event+" onValue="+onValue+" calc="+calc+" aaction="+aaction);
+	        	 try{
+	        		 System.out.println("calc="+calc); 
+	     			if (calc!=null) calc.eval(aliases);
+	     		}catch(Exception e){
+	     			e.printStackTrace();
+	     		}
+	     		
+	     		/********/
+	     		if (aaction!=null){
+	     		try {
+	                 document.ACTION.doAction(aaction,aliases,null);
+	             }
+	             catch(Exception ex) {
+	            	 ex.printStackTrace();
+	             }
+	             }
+	     		/********/
+	         }
+	      });
+        
     }
 
     public Object method(String method,Object arg) throws Exception{
@@ -62,4 +103,8 @@ public class CheckBox extends Checkbox implements GlobalValuesObject, class_type
         return "CheckBox";
     }
 
+    //protected void processItemEvent(ItemEvent event){
+    //	System.out.println("CHECKBOX processEvent called ev="+event+" calc="+calc+" aaction="+aaction);
+    //	
+    //}
 }

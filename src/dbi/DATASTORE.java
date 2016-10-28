@@ -188,6 +188,7 @@ public class DATASTORE implements GlobalValuesObject,class_method,class_type{
 			//System.out.println("Connection close.");
 	    }catch (Exception e){System.out.println("Error closing connect.."+e);}
 	    }
+	public static Connection getConnection() {return conn;}
 	public static void initConnect(String connstr, String user, String passwd) throws ConnectException,BadPasswordException{
         closeConnect();
 		//System.out.println("+++ after closeConnect");

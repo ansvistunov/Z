@@ -833,12 +833,17 @@ public class Grid extends Panel implements
                 //if (!this.editable.equals("YES")) return true;
                 if (delAction!=null) {
                     doAction(delAction);
-                    deleteRow();
-                    canv.clean=true;
-                    canv.repdelay=0;
-                    repaint();
+                  //alex patch возвращает фокус в grid
+                    emptyButton.requestFocus();
+                    
+                    //deleteRow();
+                    //canv.clean=true;
+                    //canv.repdelay=0;
+                    //repaint();
+                  //alex
                     return true;
                 }
+                if (!this.editable.equals("YES")) return true;
                 deleteRow();
                 canv.clean=true;
                 canv.repdelay=0;

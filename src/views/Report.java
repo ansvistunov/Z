@@ -24,6 +24,7 @@ public class Report extends Panel implements Retrieveable,
     final String firstPageLabel = StringBundle.Report_Label_FirstPage;//"Перв.стр.";
     final String lastPageLabel = StringBundle.Report_Label_LastPage;//"Посл.стр.";
     final String printLabel = StringBundle.Report_Label_Print;
+    
     //Object[] children = null;
     //собственно хранилище данных для отчета
     Hashtable aliases = null;
@@ -197,8 +198,10 @@ public class Report extends Panel implements Retrieveable,
         String sp;
         sp = (String)prop.get("BG_COLOR");
         if (sp!=null) setBackground(UTIL.getColor(sp));
+        
+        
         this.aliases = aliases;
-
+        
         sp = (String)prop.get("ORIENTATION");
         if (sp!=null) {
             orientation = sp;
@@ -499,6 +502,14 @@ public class Report extends Panel implements Retrieveable,
     public void toDS(){}
     public void fromDS(){}
     public void update(){}
+    
+    public void retrieve(dbi.DATASTORE ds) {
+    	this.ds = ds;
+    	root.setDatastore(ds);
+    	retrieve();
+    	
+    }
+    
     public void retrieve(){
         try{
         long t1 = System.currentTimeMillis();
@@ -841,6 +852,9 @@ public class Report extends Panel implements Retrieveable,
     public void setValueByName(String name, Object o) {}
     public Object getValue(){return this;}
     public Object getValueByName(String name) {return null;}
+    
+    //public void setDatastore()
+    
 
     class WorkCanvas extends Canvas {
         boolean clean = false;

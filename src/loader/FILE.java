@@ -16,10 +16,12 @@ import java.util.*;
 import java.nio.*;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.text.SimpleDateFormat;
 
 public class FILE implements Protocol{
 
 	String root = "/";
+	SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy-HHmmSS");
 	
 	public void init(URL rul) throws Exception{
 		root = "/"+rul.getFile()+"/";
@@ -66,7 +68,12 @@ public class FILE implements Protocol{
 		if (s.equals("REMOVE")){
 		}else 
 		if (s.equals("MKDIR")){
-		}else 
+		}else if (s.equals("TMPRENAME")){
+			File f = new File(root+((String)o));
+			File tmp = new File(root+((String)o)+sdf.format(new Date())+".tmp");
+			f.renameTo(tmp);
+			
+		}else
 		throw new ProtoFunctionNotImplemented();
 		return null;
 	}
@@ -120,15 +127,15 @@ public class FILE implements Protocol{
 
 	public void write(String file,String encoding,char[] text) throws Exception {
 		
-		 write(file, encoding, new String(text)); //TODO тут возможно нужно поработать с кодировкой
+		 write(root,file, encoding, new String(text)); //TODO тут возможно нужно поработать с кодировкой
 	}
 	
-	public void write(String file,String encoding,String text)
+	public void write(String path, String file,String encoding,String text)
 		throws	Exception{
 		try{
 			if ( encoding == null ) encoding = "KOI8_R";
 			byte[] data = text.getBytes(encoding);
-			File f = new File(root+file);
+			File f = new File(path+file);
 			FileOutputStream fs = new FileOutputStream(f);
 			fs.write(encoding.getBytes());
 			fs.write('\n');
@@ -147,6 +154,15 @@ public class FILE implements Protocol{
 		}
 
 	}
+	public void write( String file,String encoding,String text)throws	Exception{
+		write(root,file,encoding,text);
+	}
+	
+	public void write(String path,String file,String encoding,char[] text) throws Exception {
+		write(path,file, encoding, new String(text)); //TODO тут возможно нужно поработать с кодировкой
+		
+	};
+	
 	
 	public char[] getByName_chars(String path) throws Exception{
 		return getByName_chars(path,false);

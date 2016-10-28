@@ -246,7 +246,10 @@ public class HTTP implements  Protocol{
 	}
 	
 	public void write(String file,String encoding,char[] text) throws Exception {
-		 
+		 write(url.toString(),file,encoding, text);
+	}
+	public void write(String path,String file,String encoding,char[] text) throws Exception{
+		throw new ProtoFunctionNotImplemented();
 	}
 }
 

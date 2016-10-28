@@ -5,6 +5,7 @@ import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.Rectangle;
 import java.io.FileOutputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -23,10 +24,24 @@ public class RmlMem2File {
 	static String[] tags = {"FIELD","LABEL","BUTTON","COLUMN"};
 	static int srcPos = 0;
 	static int destPos = 0;
-	static char[] text;
+	/** буфер для хранения загруженного (исходного) файла*/
+	//static char[] text;
+	/** буфер для хранения результата после редактирования*/
 	static char[] result;
 	
-	public static Proper propFromFile(Hashtable aliases, boolean samefile) {
+	
+	
+	
+	
+	/**
+	 * Метод записывает в файл измененные в редакторе значения атрибутов
+	 * Считается, что изменяться могут только свойства filerProps для
+	 * тэгов tags.  
+	 * В текущей реализации фактически изменяются только свойства, отвечающие за положение и размеры элемента
+	 * @param aliases Хэштаблица aliases документа
+	 * @param samefile записываем в тот же файл или нужно показать диалог выбора файла для записи
+	 * */
+	public static char[] prepareTextFromProps(Hashtable aliases, char[] text) {
 		
 		System.out.println("propFromFile aliases="+aliases);
 		
@@ -105,7 +120,7 @@ public class RmlMem2File {
 				while(iii.hasNext()) {
 					HashRow hr = iii.next();
 					
-					partCopy(rec,hr,cs);
+					partCopy(rec,hr,cs, text);
 					System.out.println("hr="+hr+" rec="+rec);
 				}
 					
@@ -136,30 +151,15 @@ public class RmlMem2File {
 			
 			System.arraycopy(text, srcPos, result, destPos, text.length - srcPos); //копируем хвост
 			String outfile;
-			if (samefile) {
+			String path = null;
+			/*if (samefile) {
 				outfile=p+"/"+n;
+				saveRMLSameFile(outfile,result);
 			}else{
-				try{
-					Frame f = new Frame();
-					FileDialog fd = new FileDialog(f,"",FileDialog.SAVE);
-					
-					String file = null;
-					String path;
-						fd.show();
-						path = fd.getDirectory();
-						file = fd.getFile();
-						if ( file == null) throw new RTException("Cancel","");
-						outfile = file;
-						System.out.println("outfile:"+outfile);
-				}finally{
-				}
+				saveRMLasNewFile(p,n,result);
 				
-			}
-			
-			GLOBAL.loader.write(outfile,"CP1251" , result); //TODO что-то нужно делать с кодировкой
-			
-			
-			return proper;
+			}*/
+			return result;
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -168,8 +168,40 @@ public class RmlMem2File {
 		
 	}; 
 	
+	public static int saveRMLSameFile(String outfile,char[] result) throws Exception{
+		GLOBAL.loader.extendFunc("TMPRENAME", outfile);
+		GLOBAL.loader.write(outfile,"CP1251" , result); //TODO что-то нужно делать с кодировкой
+		return 1;
+		
+	}
 	
-	static void partCopy(Rectangle rec, HashRow rmlprop, int colsize ) {
+	public static int saveRMLasNewFile(String olddirectory, String oldfilename, char[] result) throws Exception{
+		
+			Frame f = new Frame();
+			FileDialog fd = new FileDialog(f,"",FileDialog.SAVE);
+			StringBuffer beginpath = new StringBuffer(GLOBAL.loader.getRoot().getPath());
+			beginpath.delete(0, 1);
+			String bp = beginpath.toString().replace("/", "\\")+"\\"+olddirectory;
+			System.out.println(bp);
+			
+			fd.setDirectory(bp);
+			fd.setFile(oldfilename);
+			String file = null;
+			
+				fd.show();
+				String path = fd.getDirectory();
+				file = fd.getFile();
+				if ( file == null) return -1; //Cancel
+				String outfile = file;
+				
+				
+				GLOBAL.loader.write(path,outfile,"CP1251" , result); //TODO что-то нужно делать с кодировкой
+				return 1;
+		
+	}
+	
+	
+	static void partCopy(Rectangle rec, HashRow rmlprop, int colsize, char[] text ) {
 		int memlen;
 		int flen;
 		int diff; 

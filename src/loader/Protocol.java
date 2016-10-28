@@ -19,4 +19,5 @@ public interface Protocol {
 	public void dump_state() throws Exception;
 	public Object extendFunc(String func,Object arg) throws Exception;
 	public void write(String file,String encoding,char[] text) throws Exception;
+	public void write(String path,String file,String encoding,char[] text) throws Exception;
 }

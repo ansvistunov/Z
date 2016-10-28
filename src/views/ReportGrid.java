@@ -246,7 +246,42 @@ public class ReportGrid extends Component {
 
                 g.setClip((left+x+1)*a/100, (offset+y+1)*a/100, (width-1)*a/100, (height-1)*a/100);
                 g.setColor(Color.black);
-                g.drawString(str,xy[0]*a/100,xy[1]*a/100);
+                
+                if (col.multiline) {//нужно распарсить строки и сделать выравнивание
+                	    String svalue1;
+                        if (col.wordwrap) {
+                            svalue1 = UTIL.makeWrap(str," ",width-cdw-3 ,col.fm);
+                        }else svalue1 = str;
+                        StringTokenizer st = new StringTokenizer(svalue1, "\n", true);
+                        int cnt = st.countTokens();//кол-во строк
+                        String[] tok = new String[cnt];
+                        boolean ptisnl=false;
+                        int curind = 0;
+                        for (int ii=0;ii<cnt;ii++) {
+                            String next = st.nextToken();
+                            if (!next.equals("\n")&&ptisnl) {
+                                ptisnl = false;                        
+                                tok[curind-1] = next;
+                                continue;
+                            }else {
+                                if (next.equals("\n")) ptisnl = true;
+                                tok[curind] = next;
+                                curind++;
+                            }
+                        }
+                        cnt = curind;
+                        int y1 =xy[1];
+                                        
+                        for (int ii=0;ii<curind;ii++) {                    
+                            String next = tok[ii];
+                            if (next.equals("\n")) next = "";
+                            int[] xxyy = UTIL.getOutPoint(width,height,col.fm,
+                            		"TOP","LEFT",cdw,col.dh,x+left,offset+y,next);
+                            //g.setClip(0,0,width,height);
+                            g.drawString(next,xxyy[0]*a/100,(y1+ii*col.fm.getHeight())*a/100);                        
+                        }
+                }
+                else g.drawString(str,xy[0]*a/100,xy[1]*a/100);
                 //System.out.println("str="+str+" x="+xy[0]+" y="+xy[1]);
             }
         }

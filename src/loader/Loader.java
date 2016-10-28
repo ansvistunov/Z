@@ -45,6 +45,10 @@ public class Loader {
 		
 		 pro.write(file, encoding, text); //TODO тут возможно нужно поработать с кодировкой
 	}
+	public void write(String path, String file,String encoding,char[] text) throws Exception {
+		
+		 pro.write(path,file, encoding, text); //TODO тут возможно нужно поработать с кодировкой
+	}
 	
 	public byte[] loadByName_bytes(String name) throws Exception{
 		//GLOBAL.waitin();
@@ -94,6 +98,7 @@ public class Loader {
 	public Object extendFunc(String name,Object arg) throws Exception{
 		return pro.extendFunc(name,arg);
 	}
+	public URL getRoot(){return url;}
 }
 
 

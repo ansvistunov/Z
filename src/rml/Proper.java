@@ -94,6 +94,22 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 			
 		}
 		
+		public HashRow getHashRow(Object key) {
+			HashRow hr;
+			
+			tmp.name = key;
+			int index = elements.indexOf(tmp);
+			
+			//System.out.println("get: key="+key+" index="+index);
+			if (index == -1) return null;
+			else {
+				hr = elements.get(index);
+				//System.out.println("get: key="+key+" return value="+hr.value);
+				return hr;
+			}
+			
+		}
+		
 		public Iterator<HashRow> filerProps(Vector<String> propers){
 			Iterator<HashRow> it = new Iterator<HashRow>() {
 				
@@ -177,6 +193,10 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 	Hashtable dhash = null;
 	static Hashtable sdhash = null;
 	int id = -1;
+	
+	public int s;//start position in source file
+	public int e;//end position in source file
+	
 	
 	public String getAliasOrId(){
 		Object ret = get("ALIAS");

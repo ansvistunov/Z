@@ -38,11 +38,12 @@ public class RMLJavaScriptParser extends JavaScriptParser{
 	public ParseResult parse(RSyntaxDocument doc, String style) {
 		System.out.println("RMLJavaScriptParser called");
 		
-		if (true) return super.parse(doc, style);
+		//if (true) 
+			return super.parse(doc, style);
 		
 		
 		
-		Element root = doc.getDefaultRootElement();
+		/*Element root = doc.getDefaultRootElement();
 		
 		RSyntaxDocument temp = null;
 		
@@ -75,16 +76,16 @@ public class RMLJavaScriptParser extends JavaScriptParser{
 			e.printStackTrace();
 		}
 		
-		/*Iterator<Token> it = temp.iterator();
+		Iterator<Token> it = temp.iterator();
 		for (;it.hasNext();) {
 			Token t = it.next();
 			System.out.println(t);
 			
-		};*/
+		};
 		ParseResult results =  super.parse(temp, style);
 		
 		System.out.println(results);
-		return results;
+		return results;*/
 		
 		
 	}

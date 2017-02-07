@@ -48,7 +48,7 @@ import org.fife.rsta.ac.java.buildpath.JarLibraryInfo;
 import org.fife.rsta.ac.java.tree.JavaOutlineTree;
 import org.fife.rsta.ac.js.IconFactory;
 import org.fife.rsta.ac.js.PreProcessingScripts;
-import org.fife.rsta.ac.js.SourceCompletionProvider;
+
 import org.fife.rsta.ac.js.ast.TypeDeclarationOptions;
 import org.fife.rsta.ac.js.tree.JavaScriptOutlineTree;
 import org.fife.rsta.ac.js.tree.JavaScriptTreeNode;
@@ -72,6 +72,7 @@ import org.mozilla.javascript.ast.VariableInitializer;
 
 import document.Document;
 import loader.GLOBAL;
+import rml.Lexemator;
 import rml.Proper;
 import rml.Proper.PropHash.HashRow;
 import rml.RmlMem2File;
@@ -250,19 +251,23 @@ public class RMLRootPane extends JRootPane implements HyperlinkListener,
 		setContentPane(mainPanel);
 		
 		
+		processDocumentVars();
 		
-		
-		
-		
+	}
+
+	
+	public void processDocumentVars(){
 		PreProcessingScripts pps = propArea.getSupport().getPreProcessing();
 		
 		TypeDeclarationOptions tdo = new TypeDeclarationOptions("testScript", true, true);
 		
-		preProcessingRoot = pps.parseScript(languageSupport.getAliasesAsVariableDecl(), tdo);
+		
+		String script = RMLLanguageSupport.getAliasesAsVariableDecl();
+		//System.out.println("Preprocess script parse...script="+script+" pps="+pps);
+		preProcessingRoot = pps.parseScript(script, tdo);
 		
 		
 	}
-
 	
 	
 	
@@ -546,7 +551,7 @@ public class RMLRootPane extends JRootPane implements HyperlinkListener,
 
 			//refreshSourceTree();
 			
-			
+			//processDocumentVars();
 
 		} catch (RuntimeException re) {
 			throw re; // FindBugs
@@ -738,7 +743,7 @@ public class RMLRootPane extends JRootPane implements HyperlinkListener,
 		RMLRootPane panel;
 		public Action3(RMLRootPane panel) {
 			this.panel = panel;
-			putValue(NAME, "Pre compile");
+			putValue(NAME, "Test Lexemator");
 			
 		}
 
@@ -748,11 +753,49 @@ public class RMLRootPane extends JRootPane implements HyperlinkListener,
 		public void actionPerformed(ActionEvent e) {
 			//panel.rightPanel.remove(panel.scrollPane);
 			//panel.rightPanel.add(panel.sp2);
-			PreProcessingScripts pps = panel.getPropArea().getSupport().getPreProcessing();
 			
-			TypeDeclarationOptions tdo = new TypeDeclarationOptions("testScript", true, true);
 			
-			pps.parseScript("var f  = new java.io.File(); ", tdo); 
+			RSyntaxDocument document = (RSyntaxDocument)panel.getTextArea().getDocument();
+			Segment text = new Segment();
+			try {
+				document.getText(0, document.getLength(), text);
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			//System.out.println("document="+document);
+			//System.out.println("text="+text.toString());
+			System.out.println("CAT HERE begin............._________________________________________________________________________________________________________________");
+			int line = 0;
+			Token t;
+			while(true){
+				try{
+					t = document.getTokenListForLine(line);
+				}catch(Exception ex){
+					break;
+				}
+				if (t == null) break;
+				line++;
+				
+				
+				while(t!=null){
+					System.out.println(t);
+					t = t.getNextToken();
+					
+				}
+				//System.out.println("NEW LINE");
+			}
+			System.out.println("CAT HERE end............._________________________________________________________________________________________________________________");
+			
+			/*Lexemator lex = new Lexemator(text);
+			try{
+				while(lex.next(true) <= text.length){
+					if (lex.type() == Lexemator.LEND) break;
+					System.out.printf("type=%d, value=|%s| \t", lex.type(), lex.as_string(false));
+				
+				}
+			}catch(Exception ex) {ex.printStackTrace();};*/
+			
 			
 			}
 			

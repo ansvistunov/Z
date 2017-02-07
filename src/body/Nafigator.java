@@ -20,6 +20,7 @@ import java.io.*;
 import java.awt.event.*;
 import document.*;
 import views.V3;
+import views.edit.EditMaketAdapter;
 
 /**
  * class Nafigator for Nafigation on Document server
@@ -226,6 +227,21 @@ public class Nafigator extends Frame{
 		m.add(i4);
 		m.add(sep);
         m.add(i3);		ret.add(m);
+		///
+		
+		String editorName=GLOBAL.pr(GLOBAL.RML_EDITOR);
+		if (editorName!=null && editorName.trim()!="") {
+			m = new Menu("Редактор");
+			//m.setActionCommand("8");
+			//m.addActionListener(new AL());
+			i1 = new MenuItem("Открыть редактор");
+			i1.setActionCommand("8");
+			i1.addActionListener(new AL());
+			m.add(i1);
+			ret.add(m);
+		}
+		
+		///
 				title = "Помощь";		m = new Menu(title);
 		s1 = "Содержание";
 		s2 = "О документе";
@@ -292,6 +308,9 @@ public class Nafigator extends Frame{
 				AboutDialog ad = new AboutDialog("О программе",Nafigator.this);
 				ad.show();
 				return;			}
+			if (e.getActionCommand().equals("8")){
+				EditMaketAdapter.createRMLEditor();
+			}
         }
     }
 

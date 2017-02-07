@@ -400,7 +400,10 @@ public Hashtable getParentAliases() {return parent_aliases;}
 		dc = Document.loadDocument(docName,objs,GLOBAL.loader);
 		dc.actor = actor;
 		dc.parent_aliases = aliases;
-		return dc.callDocument(getcurd().cntr,getcurd().mypanel);
+		Document ret =  dc.callDocument(getcurd().cntr,getcurd().mypanel);
+		if (editor!=null) 
+			editor.loaded();
+		return ret;
 	}
         
         

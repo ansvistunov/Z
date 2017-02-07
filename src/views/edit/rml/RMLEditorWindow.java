@@ -17,7 +17,9 @@ import java.util.Stack;
 import javax.swing.*;
 
 import org.fife.rsta.ac.LanguageSupportFactory;
+import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.folding.CurlyFoldParser;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParser;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
@@ -51,6 +53,11 @@ public class RMLEditorWindow extends JFrame implements Editor {
 		LanguageSupportFactory.get().addLanguageSupport(SyntaxConstants.SYNTAX_STYLE_RML,
 				"views.edit.rml.RMLLanguageSupport");
 		FoldParserManager.get().addFoldParserMapping(SyntaxConstants.SYNTAX_STYLE_RML, new CurlyFoldParser());
+		
+		AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
+		atmf.putMapping(SyntaxConstants.SYNTAX_STYLE_RML, "views.edit.rml.RMLTokenMaker");
+
+		
 		rootPanel = new RMLRootPane(this);
 		setRootPane(rootPanel);
 		// setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -78,7 +85,7 @@ public class RMLEditorWindow extends JFrame implements Editor {
 		}
 	}
 
-	public static void createWindow(/* Document document */) {
+	public  void createWindow(/* Document document */) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -106,6 +113,10 @@ public class RMLEditorWindow extends JFrame implements Editor {
 
 		System.out.println("Editor: loadDocument add to stack docname=" + docname);
 	}
+	
+	public void loaded(){
+		rootPanel.processDocumentVars();
+	}
 
 	@Override
 	public void closeNotify() {
@@ -123,6 +134,7 @@ public class RMLEditorWindow extends JFrame implements Editor {
 				// ignore
 			}
 			rootPanel.setText(null);
+			rootPanel.processDocumentVars();
 		}
 	}
 
@@ -132,7 +144,10 @@ public class RMLEditorWindow extends JFrame implements Editor {
 			String docname = null;
 			Object[] args = null;
 			char[] text = null;
-
+			
+			String startDocument = GLOBAL.pr(GLOBAL.DOC_START); //Стартовый документ
+			
+			
 			Hashtable aliases = null;
 			if (Document.getcurd() != null) { //мы работаем внутри основной программы
 				aliases = Document.getcurd().aliases;
@@ -146,7 +161,8 @@ public class RMLEditorWindow extends JFrame implements Editor {
 					text = rootPanel.getText();
 				}
 
-				if (!lastError) Document.getcurd().processAction(Document.ACT_CANCEL);
+				if (!lastError) //если документ стартовый, его закрывать нельзя 
+					if (!startDocument.equals(Document.getcurd().myname)) Document.getcurd().processAction(Document.ACT_CANCEL);
 				// if (!stackArgs.empty() && !stackDocnames.empty()){
 				// System.out.println("begin :"+memLoader);
 				// Document.l

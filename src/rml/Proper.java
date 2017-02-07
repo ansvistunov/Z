@@ -362,6 +362,15 @@ public class Proper implements GlobalValuesObject,class_type,class_field,class_m
 	}*/
 	
 	
+	public Vector propNames(){
+		Vector v = new Vector();
+		Enumeration<HashRow> e = hash.elements();
+		while(e.hasMoreElements()){
+			HashRow hr = e.nextElement();
+			v.add(hr.name);
+		}
+		return v;
+	}
 	
 	
 	public Proper traversal2(Stack<Proper> stack, Proper foo, int rec, Callback cb) throws Exception {

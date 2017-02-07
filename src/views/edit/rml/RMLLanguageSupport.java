@@ -38,7 +38,7 @@ public class RMLLanguageSupport extends AbstractLanguageSupport {
 		this.currentDocument = currentDocument;
 	}
 */
-	public String getAliasesAsVariableDecl(){
+	public static String getAliasesAsVariableDecl(){
 		//if (currentDocument == null) return "";
 		
 		Hashtable hash = Document.getcurd().aliases;
@@ -71,6 +71,7 @@ public class RMLLanguageSupport extends AbstractLanguageSupport {
 	public RMLLanguageSupport() {
 		setParameterAssistanceEnabled(true);
 		setShowDescWindow(true);
+		setAutoActivationEnabled(true);
 	}
 
 
@@ -111,9 +112,16 @@ public class RMLLanguageSupport extends AbstractLanguageSupport {
 		RMLCompletionProvider provider = getProvider();
 		AutoCompletion ac = createAutoCompletion(provider);
 		ac.install(textArea);
+		//ac.setAutoCompleteEnabled(isAutoCompleteEnabled());
+		//ac.setAutoActivationEnabled(isAutoActivationEnabled());
+		ac.setListCellRenderer(getDefaultCompletionCellRenderer());
+ 		ac.setAutoCompleteEnabled(true);
+		ac.setAutoActivationEnabled(true);
+		ac.setShowDescWindow(getShowDescWindow());
+		ac.setAutoActivationDelay(getAutoActivationDelay());
 		installImpl(textArea, ac);
 
-		textArea.setToolTipSupplier(provider);
+		//textArea.setToolTipSupplier(provider);
 		
 		RMLParser parser = new RMLParser(this);
 		

@@ -329,6 +329,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 						t = t.getNextToken();
 						
 					}
+					System.out.println("NEW LINE");
 				}
 				
 				/*

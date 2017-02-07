@@ -214,7 +214,7 @@ public class RMLOutlineTree extends AbstractSourceTree {
 	private class RMLEditorListener implements PropertyChangeListener,
 							TreeSelectionListener {
 		
-		String[] scriptProps = {"ACTION","DEP","QUERY"};
+		//String[] scriptProps = {"ACTION","DEP","QUERY"};
 
 		/**
 		 * Called whenever the text area's syntax style changes, as well as

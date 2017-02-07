@@ -151,6 +151,8 @@ public class GLOBALPROP{
 	public final static String PRINTING_BUFFER_SIZE="printing.buffer_size";
 	public final static String PRINTING_PORT="printing.port";
 		public final static String HELP_BROWSER="help.browser";	public final static String HELP_START_PAGE="help.start_page";
+	
+	public final static String RML_EDITOR="rml.editor";
 
 	public static String PRINT_RED = "\033[31m";
 	public static String PRINT_NORMAL = "\033[0m";

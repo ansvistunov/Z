@@ -20,6 +20,14 @@ public class ReportForm extends Container {
     public boolean isPrint = false;
     String type = null; 
     
+    /*public ReportForm(){
+    	super();
+    	enableEvents(AWTEvent.MOUSE_EVENT_MASK);
+    	addKeyListener(EditMaketAdapter.createEditMaketAdapter(this));
+    	
+    }
+    */
+    
     public void paint(Graphics g, int a) {
         //System.out.println("paint in form called!");
         //System.out.println("clip="+g.getClip());
@@ -78,7 +86,7 @@ public class ReportForm extends Container {
         else {
             setBackground(Color.white);
         }
-        
+        //EditMaketAdapter.getEditMaketAdapter(this).setAliases(aliases);
         sp = (String)prop.get("ALIAS");
         if (sp!=null) alias = sp;
         //else {System.out.println("Property 'alias' not found !");}

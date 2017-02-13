@@ -142,7 +142,16 @@ public class FORM extends Panel implements Retrieveable,
         }catch(Exception e) {
             System.out.println("~views.FORM::retrieve() : Catch exception from DATASTORE.retrieve() : " + e);
             return;
-        }        
+        }
+        //вызываем retrieve для всех встроенных Retriveable
+        Component[] components = this.getComponents();
+        for (int i=0;i<components.length;i++){
+        	if (components[i] instanceof Retrieveable) {
+        		((Retrieveable)components[i]).retrieve();
+        	}
+        }
+        
+        
     }
     
     public void update() {

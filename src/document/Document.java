@@ -90,7 +90,7 @@ WindowListener{
 	public String myname ="";
 	public String mypath ="";
 
-        Integer version = new Integer(1);
+    Integer version = new Integer(1);
 
 	public static boolean resetIt = false;
 
@@ -142,9 +142,23 @@ WindowListener{
 		}
 	}
 	
-	
+	/**
+	 * редактор дл€ документов
+	 * 
+	 * */
 	static Editor editor;
+	/**
+	 * јргументы дл€ текущего документа
+	 * */
+	Object[] args;
 	
+	
+	/**
+	 * @return the args
+	 */
+	public Object[] getArgs() {
+		return args;
+	}
 	public static void setEditor(Editor editor){
 		Document.editor = editor;
 	}
@@ -381,6 +395,19 @@ public Hashtable getParentAliases() {return parent_aliases;}
 		dc.parent_aliases = aliases;
 		return dc.callDocument(cntr,parent);
 	}
+        
+        /**
+    	 * загрузить и открыть документ - из Prop
+    	 */
+        public static synchronized Document callDocument(String docName,Object[] objs,
+    									Hashtable  aliases,
+    									Container cntr,
+    									Panel parent,Proper prop) throws Exception{
+    		Document dc;
+    		dc = Document.loadDocument(docName,objs,prop,GLOBAL.loader);
+    		dc.parent_aliases = aliases;
+    		return dc.callDocument(cntr,parent);
+    	}
 
 	/**
 	 * загрузить и открыть документ в том же окне в котором открыт текущ
@@ -389,6 +416,15 @@ public Hashtable getParentAliases() {return parent_aliases;}
 									Hashtable  aliases) throws Exception{
 		return callDocument(docName,objs,aliases,getcurd().cntr,getcurd().mypanel);
 	}
+        
+        /**
+    	 * загрузить и открыть документ в том же окне в котором открыт текущ
+    	 */
+        public static synchronized Document callDocumentSomeWindow(String docName,Object[] objs,
+    									Hashtable  aliases,Proper prop) throws Exception{
+    	return callDocument(docName,objs,aliases,getcurd().cntr,getcurd().mypanel,prop);
+    }
+
 
 	/**
 	 * загрузить и открыть документ в том же окне в котором открыт
@@ -540,37 +576,9 @@ public Hashtable getParentAliases() {return parent_aliases;}
         public static synchronized Document loadDocument(String DocName,Object[] args,
 							 Loader loader, char[] __text)
 		throws Exception{
-		try{
-			Document d;
-			DocName = DocName.trim();
-			if ( DocName.charAt(0) == '&' ){
-				if ( getcurd() != null)
-					if ( (d = (Document)getcurd().lhashable.get(DocName)) != null )
-						return d;
-			}else{
-				if ( (d = (Document)hashable.get(DocName)) != null )
-					return d;
-			}
-			d = new Document();
+		
 			Proper prop;
-			if (DocName.charAt(0) == '&') {
-				try{
-					prop = (Proper)getcurd().aliases.get(DocName.substring(1));
-					d.myname = (String)prop./*hash.*/get("###file###");
-					d.mypath = (String)prop./*hash.*/get("###path###");
-					//if (prop == null) throw new Exception();
-				}catch(Exception e){
-					//e.printStackTrace();
-					throw new calc.RTException("CastException",
-											   "&ALIAS <"+DocName.substring(1)
-											   +"> must containt Proper!!!!");
-				}
-			}else{
-				int foo = DocName.lastIndexOf('/');
-				if ( foo != -1 ) {
-					d.myname = DocName.substring(foo+1);
-					d.mypath = DocName.substring(0,foo);
-				}else d.myname = DocName;
+				
 				if (__text==null) { //идет загрузка из файла
 					__text = loader.loadByName_chars(DocName,true);
 				}//иначе - идет загрузка из редактора
@@ -583,118 +591,194 @@ public Hashtable getParentAliases() {return parent_aliases;}
 				}catch(Exception e){
 					throw e;
 				}
-			}
-			try{
-				d.aliases = new Hashtable();
-				d.aliases.put("###propers###",prop);
-				d.aliases.put("###document###",d);
-				d.aliases.put("ARGUMENTS",new ARG(args));
-				d.aliases.put("SELF",d);
-				d.aliases.put("GLOBAL",new ARGV());
-				d.aliases.put("_DATALOADER_",loader);
-				d.aliases.put("###DBSBROKER###",d.dbsbroker);
-
-
-
-
-				///
-				String styleFile = (String)prop.get("STYLE");
-                                String calc = (String)prop.get("CALC.LANGUAGE");
-                                if (calc!=null) d.aliases.put("CALC.LANGUAGE",calc) ;
-
-               
-                                try{
-                                   d.version = (Integer)prop.get("VERSION");
-                                }catch(Exception e){}
-                                if (d.version == null) d.version = new Integer(1);
-
-				//System.out.println("StyleFile = "+styleFile);
-				Hashtable __h = new Hashtable();				try{
-				if (styleFile != null){
-					styleFile = styleFile.trim();					byte[] text = loader.loadByName_bytes(styleFile);
-					System.out.println("content.length = "+text.length);
-									Properties _p = new Properties();					ByteArrayInputStream is = new ByteArrayInputStream(text);					_p.load(is);
-					Enumeration e = _p.keys();
-					while(e.hasMoreElements()){						try{						String _tmp = (String)e.nextElement();
-						StringTokenizer st = new StringTokenizer(_tmp,".");						String tag = st.nextToken().toUpperCase();						String pr = st.nextToken().toUpperCase();						Object val = _p.get(_tmp);
-						try{							val = Integer.valueOf((String)val);
-						}catch(Exception f){}						System.out.println("tag="+tag+" pr="+pr+" val="+val);						if (__h.containsKey(tag)){							Hashtable _h = (Hashtable)__h.get(tag);
-							_h.put(pr,val);						}else{							Hashtable _h = new Hashtable();
-							_h.put(pr,val);
-							__h.put(tag,_h);						}						}catch(Exception e1){System.out.println("Error parsing style file: Bad format\n format is: tag.properties=value");} 
-												//System.out.println("element="+e.nextElement());										
-					}
-					recur(prop,0,_p,__h);
-					
-					//prop.dump();				}				
-				}catch(Exception e){System.out.println("Error processing style:"+e);}				///
-				//System.out.println(d.aliases);
-                                d.aliases.put("###VERSION###",new Double(d.version.intValue()));
-				Object[] ch = rml.Parser.getContent(prop,d.aliases);
-				
-				
-				//System.out.println("docement load aliases="+d.aliases);
-				
-				
-				//«ачем здесь подмен€етс€ Proper????? ¬идимо, чтобы освободить пам€ть
-				
-				Proper x = new Proper(-1);
-				x.hash = prop.hash;
-				d.aliases.put("###propers###",x);
-				prop = x;
-				
-				////////////////////
-				
-				Proper.clearDefault();
-				String script = (String)prop.get("PRELOADSCRIPT");
-				if (script!=null){
-					Calc c = new Calc(script);
-					c.eval(d.aliases);
-				}				String bl = (String)prop.get("BUTTONS_LOCATION");				boolean bot = true;				if (bl!=null && bl.toUpperCase().equals("RIGHT")) bot = false;
-				d.insertObjects(ch,(String)prop.get("BUTTONS"),bot);
-				script = (String)prop.get("POSTLOADSCRIPT");
-				if (script!=null){
-					Calc c = new Calc(script);
-					
-					//System.out.println(d.aliases);
-					c.eval(d.aliases);
-				}
-
-				script = (String)prop.get("CLOSESCRIPT");
-				if (script!=null){
-					d.closescript = new Calc(script);
-				}
-
-				String h = (String)prop.get("HASHABLE");
-				if ( DocName.charAt(0) == '&' ){
-					if ( getcurd() != null )
-						if ((h!=null)&& (h.trim().toUpperCase().compareTo("YES")==0))
-							getcurd().lhashable.put(DocName,d);
-				}else{
-					if ((h!=null)&& (h.trim().toUpperCase().compareTo("YES")==0))
-						hashable.put(DocName,d);
-				}
-			}catch(Exception e){
-				//System.out.println("~document.Document::loadDocument \n\t"+e);
-				//e.printStackTrace();
-				//System.exit(0);
-				throw e;
-			}
-			return d;
-		}catch(Exception e){
-			e.printStackTrace();
-			//System.out.println("~document.Document::loadDocument \n\t"+e);
-			GLOBAL.messag("BadDocument: "+e.getMessage(),true);
-			throw new Exception("BadDocument: "+e.getMessage());
-		}
+				Document d = Document.loadDocument(DocName,args,prop,loader);
+				int foo = DocName.lastIndexOf('/');
+				if ( foo != -1 ) {
+					d.myname = DocName.substring(foo+1);
+					d.mypath = DocName.substring(0,foo);
+				}else d.myname = DocName;
+				return d;
+			
 	}
+        
+        /**
+    	 * загрузить документ
+    	 */
+     public static synchronized Document loadDocument(String DocName,Object[] args,
+    							 Proper prop, Loader loader ) throws Exception{
+    	 try{
+ 			Document d;
+ 			DocName = DocName.trim();
+ 			if ( DocName.charAt(0) == '&' ){
+ 				if ( getcurd() != null)
+ 					if ( (d = (Document)getcurd().lhashable.get(DocName)) != null )
+ 						return d;
+ 			}else{
+ 				if ( (d = (Document)hashable.get(DocName)) != null )
+ 					return d;
+ 			}
+ 			d = new Document();
+ 			if (DocName.charAt(0) == '&') {
+ 				try{
+ 					prop = (Proper)getcurd().aliases.get(DocName.substring(1));
+ 					d.myname = (String)prop./*hash.*/get("###file###");
+ 					d.mypath = (String)prop./*hash.*/get("###path###");
+ 					//if (prop == null) throw new Exception();
+ 				}catch(Exception e){
+ 					//e.printStackTrace();
+ 					throw new calc.RTException("CastException",
+ 											   "&ALIAS <"+DocName.substring(1)
+ 											   +"> must containt Proper!!!!");
+ 				}
+ 			}else{
+ 				int foo = DocName.lastIndexOf('/');
+				if ( foo != -1 ) {
+					d.myname = DocName.substring(foo+1);
+					d.mypath = DocName.substring(0,foo);
+				}else d.myname = DocName;
+				
+ 			}
+ 			try{
+ 				d.aliases = new Hashtable();
+ 				d.aliases.put("###propers###",prop);
+ 				d.aliases.put("###document###",d);
+ 				d.args = args;
+ 				d.aliases.put("ARGUMENTS",new ARG(args));
+ 				d.aliases.put("SELF",d);
+ 				d.aliases.put("GLOBAL",new ARGV());
+ 				d.aliases.put("_DATALOADER_",loader);
+ 				d.aliases.put("###DBSBROKER###",d.dbsbroker);
+
+
+
+
+ 				///
+ 				String styleFile = (String)prop.get("STYLE");
+                                 String calc = (String)prop.get("CALC.LANGUAGE");
+                                 if (calc!=null) d.aliases.put("CALC.LANGUAGE",calc) ;
+
+                
+                                 try{
+                                    d.version = (Integer)prop.get("VERSION");
+                                 }catch(Exception e){}
+                                 if (d.version == null) d.version = new Integer(1);
+
+ 				//System.out.println("StyleFile = "+styleFile);
+ 				Hashtable __h = new Hashtable();
+ 				try{
+ 				if (styleFile != null){
+ 					styleFile = styleFile.trim();
+ 					byte[] text = loader.loadByName_bytes(styleFile);
+ 					System.out.println("content.length = "+text.length);
+ 				
+ 					Properties _p = new Properties();
+ 					ByteArrayInputStream is = new ByteArrayInputStream(text);
+ 					_p.load(is);
+ 					Enumeration e = _p.keys();
+ 					while(e.hasMoreElements()){
+ 						try{
+ 						String _tmp = (String)e.nextElement();
+ 						StringTokenizer st = new StringTokenizer(_tmp,".");
+ 						String tag = st.nextToken().toUpperCase();
+ 						String pr = st.nextToken().toUpperCase();
+ 						Object val = _p.get(_tmp);
+ 						try{
+ 							val = Integer.valueOf((String)val);
+ 						}catch(Exception f){}
+ 						System.out.println("tag="+tag+" pr="+pr+" val="+val);
+ 						if (__h.containsKey(tag)){
+ 							Hashtable _h = (Hashtable)__h.get(tag);
+ 							_h.put(pr,val);
+ 						}else{
+ 							Hashtable _h = new Hashtable();
+ 							_h.put(pr,val);
+ 							__h.put(tag,_h);
+ 						}
+ 						}catch(Exception e1){System.out.println("Error parsing style file: Bad format\n format is: tag.properties=value");} 
+ 							
+ 					//System.out.println("element="+e.nextElement());
+ 						
+ 				
+ 					}
+ 					recur(prop,0,_p,__h);
+ 					
+ 					//prop.dump();
+ 				}
+ 				
+ 				}catch(Exception e){System.out.println("Error processing style:"+e);}
+ 				///
+ 				//System.out.println(d.aliases);
+                                 d.aliases.put("###VERSION###",new Double(d.version.intValue()));
+ 				Object[] ch = rml.Parser.getContent(prop,d.aliases);
+ 				
+ 				
+ 				//System.out.println("docement load aliases="+d.aliases);
+ 				
+ 				
+ 				//«ачем здесь подмен€етс€ Proper????? ¬идимо, чтобы освободить пам€ть
+ 				
+ 				Proper x = new Proper(-1);
+ 				x.hash = prop.hash;
+ 				d.aliases.put("###propers###",x);
+ 				prop = x;
+ 				
+ 				////////////////////
+ 				
+ 				Proper.clearDefault();
+ 				String script = (String)prop.get("PRELOADSCRIPT");
+ 				if (script!=null){
+ 					Calc c = new Calc(script);
+ 					c.eval(d.aliases);
+ 				}
+ 				String bl = (String)prop.get("BUTTONS_LOCATION");
+ 				boolean bot = true;
+ 				if (bl!=null && bl.toUpperCase().equals("RIGHT")) bot = false;
+ 				d.insertObjects(ch,(String)prop.get("BUTTONS"),bot);
+ 				script = (String)prop.get("POSTLOADSCRIPT");
+ 				if (script!=null){
+ 					Calc c = new Calc(script);
+ 					
+ 					//System.out.println(d.aliases);
+ 					c.eval(d.aliases);
+ 				}
+
+ 				script = (String)prop.get("CLOSESCRIPT");
+ 				if (script!=null){
+ 					d.closescript = new Calc(script);
+ 				}
+
+ 				String h = (String)prop.get("HASHABLE");
+ 				if ( DocName.charAt(0) == '&' ){
+ 					if ( getcurd() != null )
+ 						if ((h!=null)&& (h.trim().toUpperCase().compareTo("YES")==0))
+ 							getcurd().lhashable.put(DocName,d);
+ 				}else{
+ 					if ((h!=null)&& (h.trim().toUpperCase().compareTo("YES")==0))
+ 						hashable.put(DocName,d);
+ 				}
+ 			}catch(Exception e){
+ 				//System.out.println("~document.Document::loadDocument \n\t"+e);
+ 				//e.printStackTrace();
+ 				//System.exit(0);
+ 				throw e;
+ 			}
+ 			return d;
+ 		}catch(Exception e){
+ 			e.printStackTrace();
+ 			//System.out.println("~document.Document::loadDocument \n\t"+e);
+ 			GLOBAL.messag("BadDocument: "+e.getMessage(),true);
+ 			throw new Exception("BadDocument: "+e.getMessage());
+ 		}
+
+    	 
+     }   
 
 	/**
 	 * вставть компоненты в документ
 	 */
 	void insertObjects(Object[] objs,String buttons_desc,boolean bot) throws Exception{
 		// objs должен содежать не болие двух элементов один из
-		// которых визульный компонент а другой - DSCollection. ≈
+		// которых визульный компонент а другой - DSCollection. ≈сли
 		// DSCollection отсутствует она создаетс€ по умолчанию
 		try{
 			//if (objs.length > 2) {

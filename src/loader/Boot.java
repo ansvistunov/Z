@@ -37,7 +37,9 @@ class BitMap extends Panel{
 public class Boot extends Frame{
 	static{
 		try{
-        System.loadLibrary("mydll");
+	        String libPath = System.getProperty("java.library.path");
+	        //System.out.println("libPath="+libPath);
+	        System.loadLibrary("mydll");
 		}catch(UnsatisfiedLinkError e) {
 			System.out.println("Can't load library 'mydll'.Paper orientation functions disabled.");
 		}

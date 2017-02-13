@@ -2,14 +2,23 @@
 package views;
 
 import java.awt.*;
+import java.awt.PageAttributes.OrientationRequestedType;
 import java.util.*;
 import rml.*;
 import java.awt.event.*;
+import java.awt.print.PrinterJob;
+
 import loader.GLOBAL;
 import views.edit.EditMaketAdapter;
 import views.printing.*;
 import calc.objects.*;
 import calc.*;
+
+
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.OrientationRequested;
+
 
 public class Report extends Panel implements Retrieveable,
 	class_method,class_type,GlobalValuesObject {
@@ -108,7 +117,7 @@ public class Report extends Panel implements Retrieveable,
 
     public void print(int npage) {
         Graphics pg = null;
-        Properties prop = System.getProperties();
+        //Properties prop = System.getProperties();
         String rp = GLOBAL.pr(GLOBAL.PRINTING_REMOTE,"NO");
         if (rp.toUpperCase().equals("YES")) {
             String host = GLOBAL.pr(GLOBAL.PRINTING_HOST,"");
@@ -128,19 +137,28 @@ public class Report extends Panel implements Retrieveable,
             }
         }else  {
 		int res=0;
+		
+		
+		PageAttributes pageAttrs = new PageAttributes();
+		
 		try{
 		if (orientation.toUpperCase().equals("LANDSCAPE")){
+			pageAttrs.setOrientationRequested(OrientationRequestedType.LANDSCAPE);
 			res = loader.Boot.setLandscapeOrientation();
-		}else
+		}else{
+			pageAttrs.setOrientationRequested(OrientationRequestedType.PORTRAIT);
 			res = loader.Boot.setPortraitOrientation();
+			}
 		}catch(UnsatisfiedLinkError e){}
 		//System.err.println("*** result= "+res);
 
         	pjob =
             	getToolkit().getPrintJob(new Frame(),
-                	"Printing Test", prop);
+                	"Printing Test", null, pageAttrs);
+        	
 	}
         //System.out.println("prop="+prop);
+       
         if (pjob!=null) {
             System.out.println("page size = "+pjob.getPageDimension());
             System.out.println("page resolution is "+pjob.getPageResolution());

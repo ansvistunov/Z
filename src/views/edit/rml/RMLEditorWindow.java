@@ -48,6 +48,8 @@ public class RMLEditorWindow extends JFrame implements Editor {
 	 * выгружать его (ACT_CANCEL) НЕ нужно*/
 	boolean lastError = false;
 	
+	static RMLEditorWindow editor;
+	
 
 	public RMLEditorWindow(/* Document document */) {
 		LanguageSupportFactory.get().addLanguageSupport(SyntaxConstants.SYNTAX_STYLE_RML,
@@ -86,6 +88,7 @@ public class RMLEditorWindow extends JFrame implements Editor {
 	}
 
 	public  void createWindow(/* Document document */) {
+		if (editor == null)
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -96,7 +99,8 @@ public class RMLEditorWindow extends JFrame implements Editor {
 					e.printStackTrace(); // Never happens
 				}
 				Toolkit.getDefaultToolkit().setDynamicLayout(true);
-				new RMLEditorWindow(/* document */).setVisible(true);
+				editor = new RMLEditorWindow(/* document */);
+				editor.setVisible(true);
 			}
 		});
 
